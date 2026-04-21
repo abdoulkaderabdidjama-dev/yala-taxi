@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yala - Inscription Client</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: sans-serif; background: #0d0d0d; color: white;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 24px;
+    }
+    .logo-horiz { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .logo-icon {
+      width: 48px; height: 48px; background: #F5C000;
+      border-radius: 11px; display: flex; align-items: center; justify-content: center;
+    }
+    .logo-yala { color: #F5C000; font-size: 36px; font-weight: 900; letter-spacing: -1.5px; }
+    .logo-sub { color: #444; font-size: 11px; letter-spacing: 3px; }
+    .tagline { color: #555; font-size: 13px; margin-bottom: 36px; margin-top: 4px; }
+    .card {
+      background: #111; border: 1px solid #222;
+      border-radius: 20px; padding: 28px 24px;
+      width: 100%; max-width: 380px;
+    }
+    .card-title { color: #F5C000; font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+    .card-sub { color: #555; font-size: 13px; margin-bottom: 24px; }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; color: #888; font-size: 12px; margin-bottom: 6px; letter-spacing: 0.5px; }
+    .field input {
+      width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a;
+      border-radius: 12px; padding: 13px 16px; color: white;
+      font-size: 15px; outline: none; transition: border-color 0.2s;
+    }
+    .field input:focus { border-color: #F5C000; }
+    .field input::placeholder { color: #444; }
+    .whatsapp-row { display: flex; gap: 8px; }
+    .indicatif {
+      background: #1a1a1a; border: 1px solid #2a2a2a;
+      border-radius: 12px; padding: 13px 14px;
+      color: #F5C000; font-size: 15px; font-weight: 700;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .whatsapp-row input { flex: 1; }
+    #btn-inscrire {
+      width: 100%; background: #F5C000; color: #111;
+      border: none; padding: 15px; border-radius: 14px;
+      font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 8px;
+    }
+    #btn-inscrire:disabled { background: #222; color: #555; cursor: not-allowed; }
+    .erreur { color: #ef4444; font-size: 12px; margin-top: 6px; display: none; }
+    .erreur.visible { display: block; }
+    .lien-taxi { margin-top: 20px; text-align: center; color: #555; font-size: 13px; }
+    .lien-taxi a { color: #F5C000; text-decoration: none; font-weight: 700; }
+    #succes {
+      display: none; position: fixed; inset: 0;
+      background: #0d0d0d; z-index: 999;
+      flex-direction: column; align-items: center; justify-content: center;
+      padding: 32px; text-align: center;
+    }
+    #succes.visible { display: flex; }
+    .check-circle {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: #F5C000; display: flex; align-items: center;
+      justify-content: center; margin-bottom: 24px;
+    }
+    #succes h2 { color: white; font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    #succes p { color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 28px; }
+    .nom-affiche { color: #F5C000; font-weight: 800; }
+    #btn-continuer-succes {
+      background: #F5C000; color: #111; border: none;
+      padding: 15px 40px; border-radius: 14px;
+      font-size: 16px; font-weight: 800; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo-horiz">
+    <div class="logo-icon">
+      <svg viewBox="0 0 36 36" fill="none" width="32" height="32">
+        <line x1="6" y1="6" x2="18" y2="20" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+        <line x1="30" y1="6" x2="18" y2="20" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+        <line x1="18" y1="20" x2="18" y2="32" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="28" cy="28" r="6" fill="#111"/>
+        <circle cx="28" cy="28" r="3" fill="#F5C000"/>
+        <circle cx="28" cy="28" r="1.2" fill="#111"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-yala">YALA</div>
+      <div class="logo-sub">TAXI DJIBOUTI</div>
+    </div>
+  </div>
+  <p class="tagline">Trouvez un taxi en quelques secondes</p>
+  <div class="card">
+    <div class="card-title">Créer mon compte client</div>
+    <div class="card-sub">Gratuit · 30 secondes · Sans mot de passe</div>
+    <div class="field">
+      <label>VOTRE PRÉNOM ET NOM</label>
+      <input type="text" id="nom" placeholder="Ex: Ahmed Hassan" maxlength="40" oninput="verifier()"/>
+      <div class="erreur" id="err-nom">Entrez votre nom complet</div>
+    </div>
+    <div class="field">
+      <label>VOTRE NUMÉRO WHATSAPP</label>
+      <div class="whatsapp-row">
+        <div class="indicatif">+253</div>
+        <input type="tel" id="whatsapp" placeholder="77 00 00 00" maxlength="12"
+          oninput="verifier()" onkeypress="return /[0-9 ]/.test(event.key)"/>
+      </div>
+      <div class="erreur" id="err-wa">Entrez un numéro valide (8 chiffres)</div>
+    </div>
+    <button id="btn-inscrire" disabled onclick="sinscrire()">COMMENCER</button>
+    <div class="lien-taxi">
+      Vous êtes chauffeur ? <a href="/inscription-taxi">Inscrivez-vous ici</a>
+    </div>
+  </div>
+  <div id="succes">
+    <div class="check-circle">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <polyline points="8,20 16,30 32,12" stroke="#111" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h2>Bienvenue, <span class="nom-affiche" id="nom-affiche"></span> !</h2>
+    <p>Votre compte est créé.<br/>Appuyez pour appeler votre premier taxi Yala.</p>
+    <button id="btn-continuer-succes" onclick="allerAppli()">APPELER UN TAXI</button>
+  </div>
+  <script>
+    function verifier() {
+      const nom = document.getElementById('nom').value.trim();
+      const wa = document.getElementById('whatsapp').value.replace(/\s/g, '');
+      document.getElementById('btn-inscrire').disabled = !(nom.length >= 3 && wa.length >= 8);
+    }
+    function sinscrire() {
+      const nom = document.getElementById('nom').value.trim();
+      const wa = document.getElementById('whatsapp').value.replace(/\s/g, '');
+      let valide = true;
+      if (nom.length < 3) { document.getElementById('err-nom').classList.add('visible'); valide = false; }
+      else document.getElementById('err-nom').classList.remove('visible');
+      if (wa.length < 8) { document.getElementById('err-wa').classList.add('visible'); valide = false; }
+      else document.getElementById('err-wa').classList.remove('visible');
+      if (!valide) return;
+      localStorage.setItem('yala_client', JSON.stringify({ nom, whatsapp: '+253' + wa }));
+      document.getElementById('nom-affiche').textContent = nom.split(' ')[0];
+      document.getElementById('succes').classList.add('visible');
+    }
+    function allerAppli() { window.location.href = '/client'; }
+    if (localStorage.getItem('yala_client')) window.location.href = '/client';
+  </script>
+</body>
+</html>

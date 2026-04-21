@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yala - Taxi Djibouti</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: sans-serif; background: #0d0d0d; color: white; }
+    #splash {
+      position: absolute; inset: 0; background: #0d0d0d;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9999; transition: opacity 0.6s;
+    }
+    .logo-horiz { display: flex; align-items: center; gap: 14px; }
+    .logo-icon {
+      width: 54px; height: 54px; background: #F5C000;
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    }
+    .logo-yala { color: #F5C000; font-size: 40px; font-weight: 900; letter-spacing: -2px; line-height: 1; }
+    .logo-sub { color: #444; font-size: 11px; letter-spacing: 3px; margin-top: 2px; }
+    #splash .loader {
+      margin-top: 40px; width: 36px; height: 36px;
+      border: 3px solid #222; border-top-color: #F5C000;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    #splash .gps-msg { color: #666; font-size: 13px; margin-top: 14px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #gps-overlay {
+      display: none; position: absolute; inset: 0;
+      background: rgba(0,0,0,0.92); z-index: 8000;
+      flex-direction: column; align-items: center; justify-content: center;
+      padding: 32px; text-align: center;
+    }
+    #gps-overlay.visible { display: flex; }
+    .gps-icon-circle {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: #1a1a1a; border: 2px solid #F5C000;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 24px;
+    }
+    #gps-overlay h2 { color: #F5C000; font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+    #gps-overlay p { color: #888; font-size: 14px; line-height: 1.6; margin-bottom: 28px; }
+    #gps-overlay .steps {
+      background: #1a1a1a; border-radius: 12px; padding: 16px 20px;
+      text-align: left; width: 100%; max-width: 320px; margin-bottom: 24px;
+    }
+    #gps-overlay .steps p { color: #ccc; font-size: 13px; margin-bottom: 8px; }
+    #gps-overlay .steps p:last-child { margin-bottom: 0; }
+    #gps-overlay .steps span { color: #F5C000; font-weight: 700; }
+    #btn-reessayer {
+      background: #F5C000; color: #111; border: none;
+      padding: 14px 36px; border-radius: 14px;
+      font-size: 15px; font-weight: 800; cursor: pointer; width: 100%; max-width: 320px;
+    }
+    #btn-continuer {
+      background: transparent; color: #555; border: 1px solid #333;
+      padding: 12px 36px; border-radius: 14px;
+      font-size: 14px; cursor: pointer; width: 100%; max-width: 320px; margin-top: 10px;
+    }
+    #header {
+      background: #111; padding: 10px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #222;
+    }
+    #status-badge {
+      font-size: 11px; font-weight: 700; padding: 3px 10px;
+      border-radius: 20px; background: #333; color: #888;
+    }
+    #status-badge.active { background: #F5C000; color: #111; }
+    #status-badge.warn { background: #333; color: #F5C000; border: 1px solid #F5C000; }
+    #map { height: calc(100vh - 140px); }
+    #footer {
+      background: #111; padding: 12px 16px;
+      border-top: 1px solid #222;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    #btn-appeler {
+      background: #F5C000; color: #111; border: none;
+      padding: 14px; border-radius: 14px;
+      font-size: 15px; font-weight: 800; cursor: pointer; width: 100%;
+    }
+    #btn-appeler:disabled { background: #222; color: #555; cursor: not-allowed; }
+    #btn-appeler.en-route { background: #22c55e; color: white; }
+    #info-row { display: flex; align-items: center; gap: 8px; }
+    #dot { width: 8px; height: 8px; border-radius: 50%; background: #333; flex-shrink: 0; }
+    #dot.active { background: #22c55e; }
+    #dot.waiting { background: #F5C000; }
+    #dot.error { background: #ef4444; }
+    #statut { font-size: 12px; color: #888; }
+  </style>
+</head>
+<body>
+  <div id="splash">
+    <div class="logo-horiz">
+      <div class="logo-icon">
+        <svg viewBox="0 0 36 36" fill="none" width="34" height="34">
+          <line x1="6" y1="6" x2="18" y2="20" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+          <line x1="30" y1="6" x2="18" y2="20" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+          <line x1="18" y1="20" x2="18" y2="32" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="28" cy="28" r="6" fill="#111"/>
+          <circle cx="28" cy="28" r="3" fill="#F5C000"/>
+          <circle cx="28" cy="28" r="1.2" fill="#111"/>
+        </svg>
+      </div>
+      <div>
+        <span class="logo-yala">YALA</span>
+        <div class="logo-sub">TAXI DJIBOUTI</div>
+      </div>
+    </div>
+    <div class="loader"></div>
+    <div class="gps-msg" id="gps-msg">Localisation en cours...</div>
+  </div>
+  <div id="gps-overlay">
+    <div class="gps-icon-circle">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="7" stroke="#F5C000" stroke-width="2.5"/>
+        <line x1="18" y1="2" x2="18" y2="8" stroke="#F5C000" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="18" y1="28" x2="18" y2="34" stroke="#F5C000" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="2" y1="18" x2="8" y2="18" stroke="#F5C000" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="28" y1="18" x2="34" y2="18" stroke="#F5C000" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="4" y1="4" x2="32" y2="32" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h2>Localisation désactivée</h2>
+    <p>Yala a besoin de votre position GPS pour trouver un taxi près de vous.</p>
+    <div class="steps">
+      <p><span>Sur Android :</span> Paramètres → Applications → Yala → Autorisations → Localisation → Autoriser</p>
+      <p><span>Sur iPhone :</span> Réglages → Confidentialité → Service de localisation → Yala → Toujours</p>
+    </div>
+    <button id="btn-reessayer" onclick="reessayerGPS()">Réessayer</button>
+    <button id="btn-continuer" onclick="utiliserPositionDefaut()">Continuer sans GPS</button>
+  </div>
+  <div id="header">
+    <div class="logo-horiz" style="gap:8px;">
+      <div class="logo-icon" style="width:32px;height:32px;border-radius:7px;">
+        <svg viewBox="0 0 36 36" fill="none" width="22" height="22">
+          <line x1="6" y1="6" x2="18" y2="20" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+          <line x1="30" y1="6" x2="18" y2="20" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+          <line x1="18" y1="20" x2="18" y2="32" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="28" cy="28" r="5" fill="#111"/>
+          <circle cx="28" cy="28" r="2.5" fill="#F5C000"/>
+        </svg>
+      </div>
+      <span style="color:#F5C000;font-size:18px;font-weight:900;letter-spacing:-1px;">YALA</span>
+    </div>
+    <span id="status-badge">HORS LIGNE</span>
+  </div>
+  <div id="map"></div>
+  <div id="footer">
+    <div id="info-row">
+      <div id="dot"></div>
+      <span id="statut">En attente de votre position GPS...</span>
+    </div>
+    <button id="btn-appeler" disabled onclick="appellerTaxi()">APPELER UN TAXI</button>
+  </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const map = L.map('map').setView([11.5886, 43.1451], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    let maPosition = null;
+    let monMarker = null;
+    let demandeEnvoyee = false;
+    const taxiMarkers = {};
+    const taxiIcon = L.divIcon({
+      html: '<div style="background:#F5C000;color:#111;padding:3px 8px;border-radius:8px;font-size:11px;font-weight:800;">YALA</div>',
+      className: '', iconAnchor: [22, 12]
+    });
+    const clientIcon = L.divIcon({
+      html: '<div style="width:14px;height:14px;background:#1a73e8;border:3px solid white;border-radius:50%;"></div>',
+      className: '', iconAnchor: [7, 7]
+    });
+    function cacherSplash() {
+      const splash = document.getElementById('splash');
+      splash.style.opacity = '0';
+      setTimeout(() => splash.style.display = 'none', 600);
+    }
+    function afficherOverlayGPS() {
+      cacherSplash();
+      document.getElementById('gps-overlay').classList.add('visible');
+      document.getElementById('status-badge').textContent = 'GPS DÉSACTIVÉ';
+      document.getElementById('status-badge').classList.add('warn');
+      document.getElementById('dot').className = 'error';
+      document.getElementById('statut').textContent = 'Localisation désactivée';
+    }
+    function reessayerGPS() {
+      document.getElementById('gps-overlay').classList.remove('visible');
+      document.getElementById('splash').style.display = 'flex';
+      document.getElementById('splash').style.opacity = '1';
+      demarrerGPS();
+    }
+    function utiliserPositionDefaut() {
+      document.getElementById('gps-overlay').classList.remove('visible');
+      maPosition = { lat: 11.5886, lng: 43.1451 };
+      if (!monMarker) {
+        monMarker = L.marker([maPosition.lat, maPosition.lng], { icon: clientIcon })
+          .addTo(map).bindPopup('Position approximative');
+        map.setView([maPosition.lat, maPosition.lng], 15);
+      }
+      socket.emit('client-position', maPosition);
+      document.getElementById('btn-appeler').disabled = false;
+      document.getElementById('statut').textContent = 'Position approximative (GPS désactivé)';
+      document.getElementById('dot').className = 'waiting';
+      document.getElementById('status-badge').textContent = 'SANS GPS';
+      document.getElementById('status-badge').className = 'warn';
+    }
+    function demarrerGPS() {
+      if (!navigator.geolocation) { afficherOverlayGPS(); return; }
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          cacherSplash();
+          navigator.geolocation.watchPosition(
+            (pos) => {
+              maPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+              if (!monMarker) {
+                monMarker = L.marker([maPosition.lat, maPosition.lng], { icon: clientIcon })
+                  .addTo(map).bindPopup('Vous êtes ici');
+                map.setView([maPosition.lat, maPosition.lng], 16);
+              } else {
+                monMarker.setLatLng([maPosition.lat, maPosition.lng]);
+              }
+              socket.emit('client-position', maPosition);
+              if (!demandeEnvoyee) document.getElementById('btn-appeler').disabled = false;
+              document.getElementById('status-badge').textContent = 'EN LIGNE';
+              document.getElementById('status-badge').className = 'active';
+              document.getElementById('dot').className = 'active';
+              document.getElementById('statut').textContent = 'Position détectée — prêt à appeler';
+            },
+            () => {},
+            { enableHighAccuracy: true, maximumAge: 5000 }
+          );
+        },
+        () => afficherOverlayGPS(),
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    }
+    function appellerTaxi() {
+      if (!maPosition || demandeEnvoyee) return;
+      demandeEnvoyee = true;
+      socket.emit('client-demande-taxi', maPosition);
+      document.getElementById('btn-appeler').disabled = true;
+      document.getElementById('btn-appeler').textContent = 'RECHERCHE EN COURS...';
+      document.getElementById('statut').textContent = 'Demande envoyée aux taxis proches...';
+      document.getElementById('dot').className = 'waiting';
+    }
+    socket.on('update-taxis', (taxis) => {
+      Object.keys(taxiMarkers).forEach(id => {
+        if (!taxis.find(t => t.id === id)) {
+          map.removeLayer(taxiMarkers[id]);
+          delete taxiMarkers[id];
+        }
+      });
+      taxis.forEach(t => {
+        if (taxiMarkers[t.id]) taxiMarkers[t.id].setLatLng([t.lat, t.lng]);
+        else taxiMarkers[t.id] = L.marker([t.lat, t.lng], { icon: taxiIcon }).addTo(map);
+      });
+    });
+    socket.on('taxi-en-route', (data) => {
+      const btn = document.getElementById('btn-appeler');
+      btn.classList.add('en-route');
+      btn.disabled = false;
+      btn.textContent = 'TAXI EN ROUTE VERS VOUS';
+      document.getElementById('statut').textContent = data.nom + ' arrive vers vous !';
+      document.getElementById('dot').className = 'active';
+      setTimeout(() => {
+        const msg = encodeURIComponent('Bonjour, je suis votre client Yala. Je vous attends !');
+        window.open('https://wa.me/' + data.whatsapp.replace('+','') + '?text=' + msg, '_blank');
+      }, 1500);
+    });
+    const profilClient = localStorage.getItem('yala_client');
+    if (!profilClient) {
+      window.location.href = '/inscription-client';
+    } else {
+      const p = JSON.parse(profilClient);
+      socket.emit('client-profil', { nom: p.nom, whatsapp: p.whatsapp });
+      demarrerGPS();
+    }
+  </script>
+</body>
+</html>
