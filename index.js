@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// ✅ fonction distance corrigée
+// ✅ fonction distance
 function distance(a, b) {
   const R = 6371;
   const dLat = (b.lat - a.lat) * Math.PI / 180;
@@ -26,44 +26,58 @@ function distance(a, b) {
 const courses = {};
 
 app.use(express.json());
-app.use(express.static('public'));
 
-app.get('/client', (req, res) => res.sendFile(path.join(__dirname, 'public', 'client.html')));
-app.get('/taxi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'taxi.html')));
-app.get('/inscription-client', (req, res) => res.sendFile(path.join(__dirname, 'public', 'inscription-client.html')));
-app.get('/inscription-taxi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'inscription-taxi.html')));
+// ✅ CORRECTION IMPORTANTE POUR RENDER
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ✅ ROUTE HOME (évite "Cannot GET /")
+app.get('/', (req, res) => {
+  res.send("Yala Taxi est en ligne 🚖✅");
+});
+
+// ✅ ROUTES HTML (FIXÉES)
+app.get('/client', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'client.html'));
+});
+
+app.get('/taxi', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'taxi.html'));
+});
+
+app.get('/inscription-client', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'inscription-client.html'));
+});
+
+app.get('/inscription-taxi', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'inscription-taxi.html'));
+});
 
 const taxis = {};
 const clients = {};
 
 io.on('connection', (socket) => {
 
-  // ✅ POSITION TAXI
   socket.on('taxi-position', (data) => {
     taxis[socket.id] = { ...taxis[socket.id], ...data, id: socket.id };
     io.emit('update-taxis', Object.values(taxis));
   });
 
-  // ✅ PROFIL TAXI
   socket.on('taxi-profil', (data) => {
     taxis[socket.id] = { ...data, id: socket.id };
   });
 
-  // ✅ POSITION CLIENT
   socket.on('client-position', (data) => {
     clients[socket.id] = { ...clients[socket.id], ...data, id: socket.id };
   });
 
-  // ✅ PROFIL CLIENT
   socket.on('client-profil', (data) => {
     clients[socket.id] = { ...data, id: socket.id };
   });
 
-  // ✅ DEMANDE TAXI (AVEC FILTRE PROXIMITÉ + COURSE)
+  // ✅ DEMANDE TAXI
   socket.on('client-demande-taxi', (data) => {
     const clientId = socket.id;
 
-    // ✅ enregistrer course
     courses[clientId] = {
       status: "en_attente",
       taxiId: null
@@ -71,7 +85,6 @@ io.on('connection', (socket) => {
 
     const client = clients[clientId];
 
-    // ✅ envoyer seulement aux taxis proches
     Object.values(taxis).forEach(taxi => {
       if (!taxi.lat || !taxi.lng) return;
 
@@ -80,7 +93,7 @@ io.on('connection', (socket) => {
         { lat: data.lat, lng: data.lng }
       );
 
-      if (dist < 2) { // 2 km
+      if (dist < 2) {
         io.to(taxi.id).emit('nouvelle-demande', {
           clientId,
           lat: data.lat,
@@ -92,7 +105,7 @@ io.on('connection', (socket) => {
     });
   });
 
-  // ✅ TAXI ACCEPTE (VERROUILLAGE)
+  // ✅ ACCEPTATION TAXI
   socket.on('taxi-accepte', (data) => {
     const course = courses[data.clientId];
     if (!course) return;
@@ -109,7 +122,6 @@ io.on('connection', (socket) => {
         whatsapp: taxi?.whatsapp || ''
       });
 
-      // ✅ annuler pour autres taxis
       Object.values(taxis).forEach(taxi => {
         if (taxi.id !== socket.id) {
           io.to(taxi.id).emit('course-annulee', data.clientId);
@@ -118,7 +130,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // ✅ DECONNEXION
   socket.on('disconnect', () => {
     delete taxis[socket.id];
     delete clients[socket.id];
@@ -130,4 +141,4 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 10000;
-server.listen(PORT, () => console.log('Yala démarré sur port ' + PORT));
+server.listen(PORT, () => console.log('✅ Yala démarré sur port ' + PORT));
