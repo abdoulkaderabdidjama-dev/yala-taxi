@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Inscription Client</title>
+</head>
+<body>
+
+  <h1>Inscription Client 🚖</h1>
+
+  <input id="nom" placeholder="Nom"><br><br>
+  <input id="whatsapp" placeholder="WhatsApp"><br><br>
+
+  <button onclick="inscrireClient()">S'inscrire</button>
+
+  <p id="status"></p>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    function inscrireClient() {
+      const nom = document.getElementById("nom").value;
+      const whatsapp = document.getElementById("whatsapp").value;
+
+      socket.emit("client-profil", {
+        nom,
+        whatsapp
+      });
+
+      document.getElementById("status").innerText =
+        "✅ Inscription réussie";
+    }
+  </script>
+
+</body>
+</html>
