@@ -7,6 +7,24 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// ✅ fonction distance corrigée
+function distance(a, b) {
+  const R = 6371;
+  const dLat = (b.lat - a.lat) * Math.PI / 180;
+  const dLng = (b.lng - a.lng) * Math.PI / 180;
+
+  const lat1 = a.lat * Math.PI / 180;
+  const lat2 = b.lat * Math.PI / 180;
+
+  const x = dLat;
+  const y = dLng * Math.cos((lat1 + lat2) / 2);
+
+  return Math.sqrt(x * x + y * y) * R;
+}
+
+// ✅ stockage des courses
+const courses = {};
+
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -20,55 +38,92 @@ const clients = {};
 
 io.on('connection', (socket) => {
 
+  // ✅ POSITION TAXI
   socket.on('taxi-position', (data) => {
-    if (taxis[socket.id]) {
-      taxis[socket.id] = { ...taxis[socket.id], ...data };
-    } else {
-      taxis[socket.id] = { ...data, id: socket.id };
-    }
+    taxis[socket.id] = { ...taxis[socket.id], ...data, id: socket.id };
     io.emit('update-taxis', Object.values(taxis));
   });
 
+  // ✅ PROFIL TAXI
   socket.on('taxi-profil', (data) => {
     taxis[socket.id] = { ...data, id: socket.id };
-    io.emit('update-taxis', Object.values(taxis));
   });
 
+  // ✅ POSITION CLIENT
   socket.on('client-position', (data) => {
-    if (clients[socket.id]) {
-      clients[socket.id] = { ...clients[socket.id], ...data };
-    } else {
-      clients[socket.id] = { ...data, id: socket.id };
-    }
-    io.emit('update-clients', Object.values(clients));
+    clients[socket.id] = { ...clients[socket.id], ...data, id: socket.id };
   });
 
+  // ✅ PROFIL CLIENT
   socket.on('client-profil', (data) => {
     clients[socket.id] = { ...data, id: socket.id };
-    io.emit('update-clients', Object.values(clients));
   });
 
+  // ✅ DEMANDE TAXI (AVEC FILTRE PROXIMITÉ + COURSE)
   socket.on('client-demande-taxi', (data) => {
-    io.emit('nouvelle-demande', {
-      ...data,
-      clientId: socket.id,
-      nom: clients[socket.id]?.nom || 'Client',
-      whatsapp: clients[socket.id]?.whatsapp || ''
+    const clientId = socket.id;
+
+    // ✅ enregistrer course
+    courses[clientId] = {
+      status: "en_attente",
+      taxiId: null
+    };
+
+    const client = clients[clientId];
+
+    // ✅ envoyer seulement aux taxis proches
+    Object.values(taxis).forEach(taxi => {
+      if (!taxi.lat || !taxi.lng) return;
+
+      const dist = distance(
+        { lat: taxi.lat, lng: taxi.lng },
+        { lat: data.lat, lng: data.lng }
+      );
+
+      if (dist < 2) { // 2 km
+        io.to(taxi.id).emit('nouvelle-demande', {
+          clientId,
+          lat: data.lat,
+          lng: data.lng,
+          nom: client?.nom || 'Client',
+          whatsapp: client?.whatsapp || ''
+        });
+      }
     });
   });
 
+  // ✅ TAXI ACCEPTE (VERROUILLAGE)
   socket.on('taxi-accepte', (data) => {
-    const taxi = taxis[socket.id];
-    io.to(data.clientId).emit('taxi-en-route', {
-      taxiId: socket.id,
-      nom: taxi?.nom || 'Chauffeur',
-      whatsapp: taxi?.whatsapp || ''
-    });
+    const course = courses[data.clientId];
+    if (!course) return;
+
+    if (course.status === "en_attente") {
+      course.status = "acceptee";
+      course.taxiId = socket.id;
+
+      const taxi = taxis[socket.id];
+
+      io.to(data.clientId).emit('taxi-en-route', {
+        taxiId: socket.id,
+        nom: taxi?.nom || 'Chauffeur',
+        whatsapp: taxi?.whatsapp || ''
+      });
+
+      // ✅ annuler pour autres taxis
+      Object.values(taxis).forEach(taxi => {
+        if (taxi.id !== socket.id) {
+          io.to(taxi.id).emit('course-annulee', data.clientId);
+        }
+      });
+    }
   });
 
+  // ✅ DECONNEXION
   socket.on('disconnect', () => {
     delete taxis[socket.id];
     delete clients[socket.id];
+    delete courses[socket.id];
+
     io.emit('update-taxis', Object.values(taxis));
     io.emit('update-clients', Object.values(clients));
   });
