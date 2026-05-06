@@ -27,29 +27,29 @@ const courses = {};
 
 app.use(express.json());
 
-// ✅ CORRECTION IMPORTANTE POUR RENDER
+// ✅ IMPORTANT pour servir les fichiers HTML
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ✅ ROUTE HOME (évite "Cannot GET /")
+// ✅ PAGE D’ACCUEIL
 app.get('/', (req, res) => {
-  res.send("Yala Taxi est en ligne 🚖✅");
+  res.send("✅ Yala Taxi est en ligne 🚖");
 });
 
-// ✅ ROUTES HTML (FIXÉES)
+// ✅ ROUTES HTML (PROPRES)
 app.get('/client', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'client.html'));
+  res.sendFile(path.resolve(__dirname, 'public', 'client.html'));
 });
 
 app.get('/taxi', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'taxi.html'));
+  res.sendFile(path.resolve(__dirname, 'public', 'taxi.html'));
 });
 
 app.get('/inscription-client', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'inscription-client.html'));
+  res.sendFile(path.resolve(__dirname, 'public', 'inscription-client.html'));
 });
 
 app.get('/inscription-taxi', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'inscription-taxi.html'));
+  res.sendFile(path.resolve(__dirname, 'public', 'inscription-taxi.html'));
 });
 
 const taxis = {};
@@ -57,19 +57,23 @@ const clients = {};
 
 io.on('connection', (socket) => {
 
+  // ✅ POSITION TAXI
   socket.on('taxi-position', (data) => {
     taxis[socket.id] = { ...taxis[socket.id], ...data, id: socket.id };
     io.emit('update-taxis', Object.values(taxis));
   });
 
+  // ✅ PROFIL TAXI
   socket.on('taxi-profil', (data) => {
     taxis[socket.id] = { ...data, id: socket.id };
   });
 
+  // ✅ POSITION CLIENT
   socket.on('client-position', (data) => {
     clients[socket.id] = { ...clients[socket.id], ...data, id: socket.id };
   });
 
+  // ✅ PROFIL CLIENT
   socket.on('client-profil', (data) => {
     clients[socket.id] = { ...data, id: socket.id };
   });
@@ -130,6 +134,7 @@ io.on('connection', (socket) => {
     }
   });
 
+  // ✅ DECONNEXION
   socket.on('disconnect', () => {
     delete taxis[socket.id];
     delete clients[socket.id];
@@ -140,5 +145,7 @@ io.on('connection', (socket) => {
   });
 });
 
+// ✅ PORT RENDER
 const PORT = process.env.PORT || 10000;
 server.listen(PORT, () => console.log('✅ Yala démarré sur port ' + PORT));
+``
