@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Yala Taxi Chauffeur</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #eef;
+        }
+
+        button {
+            padding: 10px;
+            margin: 10px;
+            width: 80%;
+            background: blue;
+            color: white;
+            border: none;
+        }
+
+        .client {
+            background: white;
+            padding: 10px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>🚕 Chauffeur</h2>
+
+<button onclick="loadClients()">Voir clients</button>
+
+<div id="clients"></div>
+
+<script>
+function loadClients() {
+    fetch("https://yala-taxi.onrender.com/api/client")
+    .then(res => res.json())
+    .then(data => {
+        let html = "";
+
+        data.forEach(c => {
+            html += `
+                <div class="client">
+                    <p><b>${c.nom}</b></p>
+                    <p>${c.phone}</p>
+                    <a href="https://wa.me/${c.phone}" target="_     Contacter WhatsApp
+                    </a>
+                </div>
+            `;
+        });
+
+        document.getElementById("clients").innerHTML = html;
+    });
+}
+</script>
+
+</body>
+</html>
+``
