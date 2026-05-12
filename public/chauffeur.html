@@ -1,63 +1,608 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Yala Taxi Chauffeur</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>YalaTaxi — Chauffeur</title>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --amber: #d97706;
+    --amber-dark: #b45309;
+    --amber-light: #fef3c7;
+    --green: #16a34a;
+    --red: #dc2626;
+    --bg: #fffbeb;
+    --card: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --radius: 16px;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    <style>
-        body {
-            font-family: Arial;
-            text-align: center;
-            background: #eef;
-        }
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
 
-        button {
-            padding: 10px;
-            margin: 10px;
-            width: 80%;
-            background: blue;
-            color: white;
-            border: none;
-        }
+  /* ── AUTH ── */
+  #screen-auth {
+    background: linear-gradient(160deg, #78350f 0%, #d97706 60%, #f59e0b 100%);
+    align-items: center; justify-content: center; padding: 32px 24px; gap: 20px;
+  }
+  .auth-logo { font-size: 56px; animation: bounce 2s infinite; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .auth-title { font-size: 32px; font-weight: 800; color: #fff; letter-spacing: -1px; }
+  .auth-sub { font-size: 14px; color: rgba(255,255,255,0.75); text-align: center; }
+  .auth-badge {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35);
+    color: #fff; font-size: 12px; font-weight: 600; padding: 6px 16px; border-radius: 20px; letter-spacing: 0.5px;
+  }
+  .auth-card {
+    background: #fff; border-radius: 24px; padding: 24px; width: 100%; max-width: 400px;
+    display: flex; flex-direction: column; gap: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+  .auth-tabs { display: flex; background: #f1f5f9; border-radius: 12px; padding: 4px; gap: 4px; }
+  .auth-tab {
+    flex: 1; padding: 10px; border: none; border-radius: 9px; font-size: 13px;
+    font-weight: 600; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--muted);
+  }
+  .auth-tab.active { background: #fff; color: var(--amber); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .inp {
+    width: 100%; padding: 14px 16px; border: 1.5px solid var(--border);
+    border-radius: 12px; font-size: 15px; outline: none; transition: border-color 0.2s;
+    font-family: inherit; color: var(--text); background: #fafafa;
+  }
+  .inp:focus { border-color: var(--amber); background: #fff; }
+  .btn {
+    width: 100%; padding: 15px; border: none; border-radius: 12px;
+    font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-amber { background: var(--amber); color: #fff; }
+  .btn-amber:hover { background: var(--amber-dark); }
+  .btn-green { background: var(--green); color: #fff; }
+  .btn-red { background: var(--red); color: #fff; }
+  .btn-outline { background: #fff; color: var(--amber); border: 2px solid var(--amber); }
+  .auth-switch { font-size: 13px; color: var(--muted); text-align: center; }
+  .auth-switch a { color: var(--amber); font-weight: 600; cursor: pointer; text-decoration: none; }
 
-        .client {
-            background: white;
-            padding: 10px;
-            margin: 10px;
-        }
-    </style>
+  /* ── ACCUEIL ── */
+  #screen-home { background: var(--bg); }
+  .topbar {
+    background: var(--amber); color: #fff; padding: 16px 20px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .topbar-left { display: flex; flex-direction: column; }
+  .topbar-greeting { font-size: 12px; opacity: 0.85; }
+  .topbar-name { font-size: 18px; font-weight: 700; }
+  .topbar-right { display: flex; gap: 8px; align-items: center; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: rgba(255,255,255,0.2); border: none; color: #fff;
+    font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  #map { height: 240px; width: 100%; z-index: 1; }
+  .content { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+
+  /* Toggle statut */
+  .toggle-card {
+    background: var(--card); border-radius: var(--radius); padding: 16px;
+    border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .toggle-info { flex: 1; }
+  .toggle-title { font-size: 16px; font-weight: 700; }
+  .toggle-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .toggle-switch {
+    width: 52px; height: 28px; border-radius: 14px; border: none; cursor: pointer;
+    position: relative; transition: background 0.3s; flex-shrink: 0;
+  }
+  .toggle-switch::after {
+    content:''; position: absolute; width: 22px; height: 22px; border-radius: 50%;
+    background: #fff; top: 3px; transition: left 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .toggle-off { background: #cbd5e1; }
+  .toggle-off::after { left: 3px; }
+  .toggle-on { background: #16a34a; }
+  .toggle-on::after { left: 27px; }
+
+  /* Stats */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card {
+    background: var(--card); border-radius: var(--radius); padding: 14px;
+    border: 1px solid var(--border); text-align: center;
+  }
+  .stat-value { font-size: 24px; font-weight: 800; color: var(--amber); }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* Section */
+  .section-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
+
+  /* Carte demande */
+  .demand-card {
+    background: var(--card); border-radius: var(--radius); padding: 14px 16px;
+    border: 2px solid var(--amber); display: flex; flex-direction: column; gap: 10px;
+    animation: pulse-border 2s infinite;
+  }
+  @keyframes pulse-border { 0%,100%{border-color:var(--amber)} 50%{border-color:#fbbf24} }
+
+  .demand-header { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; flex-shrink: 0;
+    background: #dbeafe; color: #1e40af;
+  }
+  .demand-info { flex: 1; }
+  .demand-name { font-size: 15px; font-weight: 700; }
+  .demand-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .dist { font-size: 12px; color: var(--amber); font-weight: 700; }
+
+  .demand-actions { display: flex; gap: 10px; }
+  .btn-accept { flex: 1; padding: 13px; background: var(--green); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .btn-refuse { flex: 1; padding: 13px; background: #fee2e2; color: var(--red); border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+  /* Course en cours */
+  .course-active-card {
+    background: linear-gradient(135deg, #166534, #16a34a);
+    border-radius: var(--radius); padding: 16px; color: #fff;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .course-active-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9; }
+  .course-active-name { font-size: 18px; font-weight: 800; }
+  .progress-bar { height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #fff; border-radius: 2px; animation: prog 3s ease-in-out infinite alternate; }
+  @keyframes prog { 0%{width:20%} 100%{width:90%} }
+  .course-btns { display: flex; gap: 8px; }
+  .btn-wa-course { flex:1; padding:10px; background:rgba(255,255,255,0.15); border:none; color:#fff; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .btn-finish { flex:1; padding:10px; background:#fff; color:#166534; border:none; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+
+  /* État vide */
+  .empty-state {
+    background: var(--card); border-radius: var(--radius); padding: 24px;
+    border: 1px solid var(--border); text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .empty-state .emoji { font-size: 36px; }
+  .empty-state p { font-size: 14px; color: var(--muted); }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #0f172a; color: #fff; padding: 12px 20px; border-radius: 12px;
+    font-size: 14px; font-weight: 500; z-index: 9999; opacity: 0;
+    transition: opacity 0.3s; white-space: nowrap; pointer-events: none;
+    max-width: 90vw; text-align: center;
+  }
+  .toast.show { opacity: 1; }
+
+  /* Alerte sonore visuelle */
+  .notif-banner {
+    position: fixed; top: 70px; left: 16px; right: 16px;
+    background: var(--amber); color: #fff; border-radius: 14px; padding: 14px 16px;
+    z-index: 500; font-weight: 700; font-size: 15px; text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2); animation: slideDown 0.3s ease;
+    display: none;
+  }
+  @keyframes slideDown { from{transform:translateY(-20px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+  .loader { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .bottom-nav {
+    display: flex; background: var(--card); border-top: 1px solid var(--border);
+    position: sticky; bottom: 0; z-index: 100;
+  }
+  .nav-item {
+    flex: 1; padding: 10px 4px 8px; display: flex; flex-direction: column;
+    align-items: center; gap: 3px; cursor: pointer; border: none;
+    background: transparent; font-family: inherit; color: var(--muted); font-size: 9px; font-weight: 600;
+  }
+  .nav-item.active { color: var(--amber); }
+  .nav-icon { font-size: 22px; }
+</style>
 </head>
 <body>
 
-<h2>🚕 Chauffeur</h2>
+<!-- ══════════════════════════════════════════
+     ÉCRAN AUTH
+══════════════════════════════════════════ -->
+<div class="screen active" id="screen-auth">
+  <div class="auth-logo">🚗</div>
+  <div class="auth-title">YalaTaxi</div>
+  <div class="auth-sub">Trouvez des clients autour de vous à Djibouti</div>
+  <span class="auth-badge">ESPACE CHAUFFEUR</span>
 
-<button onclick="loadClients()">Voir clients</button>
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Se connecter</button>
+      <button class="auth-tab" onclick="switchTab('register')">S'inscrire</button>
+    </div>
 
-<div id="clients"></div>
+    <div id="form-login">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <input class="inp" id="login-wa" type="tel" placeholder="Numéro WhatsApp (+253...)" />
+        <input class="inp" id="login-pw" type="password" placeholder="Mot de passe" />
+        <button class="btn btn-amber" onclick="connexion()">Se connecter</button>
+      </div>
+    </div>
+
+    <div id="form-register" style="display:none;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <input class="inp" id="reg-nom" type="text" placeholder="Votre prénom" />
+        <input class="inp" id="reg-wa" type="tel" placeholder="Numéro WhatsApp (+253...)" />
+        <input class="inp" id="reg-plaque" type="text" placeholder="Plaque d'immatriculation (ex: DJ 1234 AB)" />
+        <input class="inp" id="reg-pw" type="password" placeholder="Créer un mot de passe" />
+        <button class="btn btn-amber" onclick="inscription()">Créer mon compte</button>
+      </div>
+    </div>
+
+    <p class="auth-switch" id="switch-text">
+      Pas encore de compte ? <a onclick="switchTab('register')">S'inscrire</a>
+    </p>
+    <p class="auth-switch">
+      Vous êtes client ? <a href="client.html">Espace client →</a>
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ÉCRAN PRINCIPAL
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-home">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-greeting">Bonne journée 🚗</span>
+      <span class="topbar-name" id="topbar-name">Mohamed</span>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" onclick="deconnexion()">🚪</button>
+    </div>
+  </div>
+
+  <!-- Notification nouvelle demande -->
+  <div class="notif-banner" id="notif-banner">🔔 Nouvelle demande client !</div>
+
+  <div id="map"></div>
+
+  <div class="content">
+
+    <!-- Toggle statut -->
+    <div class="toggle-card" onclick="toggleStatut()">
+      <div class="toggle-info">
+        <p class="toggle-title" id="statut-label">🟢 Disponible</p>
+        <p class="toggle-sub" id="statut-sub">Les clients peuvent vous voir sur la carte</p>
+      </div>
+      <button class="toggle-switch toggle-on" id="toggle-btn" aria-label="Changer statut"></button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <p class="stat-value" id="stat-courses">0</p>
+        <p class="stat-label">Courses aujourd'hui</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-value">⭐ <span id="stat-note">5.0</span></p>
+        <p class="stat-label">Note moyenne</p>
+      </div>
+    </div>
+
+    <!-- Course en cours -->
+    <div id="course-active" style="display:none;">
+      <div class="course-active-card">
+        <p class="course-active-title">🚖 Course acceptée</p>
+        <p class="course-active-name" id="client-en-cours">—</p>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+        <div class="course-btns">
+          <button class="btn-wa-course" onclick="ouvrirWhatsapp()">📞 WhatsApp</button>
+          <button class="btn-finish" onclick="terminerCourse()">✅ Terminer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demandes -->
+    <p class="section-title">Demandes clients</p>
+    <div id="demandes-list">
+      <div class="empty-state">
+        <div class="emoji">⏳</div>
+        <p id="empty-msg">Passez en ligne pour recevoir des demandes de clients proches de vous.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-item active"><span class="nav-icon">🏠</span>Accueil</button>
+    <button class="nav-item" onclick="toast('Historique — bientôt disponible')"><span class="nav-icon">📋</span>Courses</button>
+    <button class="nav-item" onclick="toast('Avis — bientôt disponible')"><span class="nav-icon">⭐</span>Avis</button>
+    <button class="nav-item" onclick="voirProfil()"><span class="nav-icon">👤</span>Profil</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-function loadClients() {
-    fetch("https://yala-taxi.onrender.com/api/client")
-    .then(res => res.json())
-    .then(data => {
-        let html = "";
+const API = 'https://yala-taxi.onrender.com';
+let token = localStorage.getItem('yt_token');
+let user = JSON.parse(localStorage.getItem('yt_user') || 'null');
+let socket = null;
+let map = null;
+let userMarker = null;
+let userLat = null, userLng = null;
+let enLigne = true;
+let courseActiveId = null;
+let clientWA = null;
+let clientNomCours = null;
+let coursesAujourd = 0;
+let demandeEnCours = null;
 
-        data.forEach(c => {
-            html += `
-                <div class="client">
-                    <p><b>${c.nom}</b></p>
-                    <p>${c.phone}</p>
-                    <a href="https://wa.me/${c.phone}" target="_     Contacter WhatsApp
-                    </a>
-                </div>
-            `;
-        });
+window.onload = () => {
+  if (token && user && user.role === 'chauffeur') afficherAccueil();
+};
 
-        document.getElementById("clients").innerHTML = html;
+// ── AUTH ──────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (tab==='login'&&i===0)||(tab==='register'&&i===1)));
+  document.getElementById('switch-text').innerHTML = tab === 'login'
+    ? 'Pas encore de compte ? <a onclick="switchTab(\'register\')">S\'inscrire</a>'
+    : 'Déjà un compte ? <a onclick="switchTab(\'login\')">Se connecter</a>';
+}
+
+async function inscription() {
+  const nom = document.getElementById('reg-nom').value.trim();
+  const whatsapp = document.getElementById('reg-wa').value.trim();
+  const plaque = document.getElementById('reg-plaque').value.trim();
+  const password = document.getElementById('reg-pw').value;
+  if (!nom || !whatsapp || !plaque || !password) return toast('Remplissez tous les champs');
+  try {
+    const r = await fetch(`${API}/api/inscription`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ nom, whatsapp, role:'chauffeur', password, plaque })
     });
+    const d = await r.json();
+    if (!r.ok) return toast(d.error || 'Erreur');
+    sauvegarderSession(d.token, d.user);
+    afficherAccueil();
+  } catch { toast('Impossible de contacter le serveur'); }
+}
+
+async function connexion() {
+  const whatsapp = document.getElementById('login-wa').value.trim();
+  const password = document.getElementById('login-pw').value;
+  if (!whatsapp || !password) return toast('Remplissez tous les champs');
+  try {
+    const r = await fetch(`${API}/api/connexion`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ whatsapp, password })
+    });
+    const d = await r.json();
+    if (!r.ok) return toast(d.error || 'Erreur');
+    if (d.user.role !== 'chauffeur') return toast('Ce compte est un compte client. Utilisez l\'espace client.');
+    sauvegarderSession(d.token, d.user);
+    afficherAccueil();
+  } catch { toast('Impossible de contacter le serveur'); }
+}
+
+function sauvegarderSession(t, u) {
+  token = t; user = u;
+  localStorage.setItem('yt_token', t);
+  localStorage.setItem('yt_user', JSON.stringify(u));
+}
+
+function deconnexion() {
+  if (enLigne) changerStatut('hors_ligne');
+  localStorage.removeItem('yt_token');
+  localStorage.removeItem('yt_user');
+  location.reload();
+}
+
+// ── ACCUEIL ───────────────────────────────────────────
+function afficherAccueil() {
+  document.getElementById('screen-auth').classList.remove('active');
+  document.getElementById('screen-home').classList.add('active');
+  document.getElementById('topbar-name').textContent = user.nom;
+  document.getElementById('stat-note').textContent = user.note || '5.0';
+  initMap();
+  initSocket();
+  detecterPosition();
+}
+
+function initMap() {
+  if (map) return;
+  map = L.map('map', { zoomControl: false }).setView([11.5883, 43.1456], 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+}
+
+function initSocket() {
+  socket = io(API);
+  socket.on('connect', () => {
+    socket.emit('register', { userId: user.id, role: 'chauffeur' });
+  });
+
+  socket.on('nouvelle_demande', (data) => {
+    demandeEnCours = data;
+    clientWA = data.client.whatsapp;
+    afficherDemande(data);
+    afficherNotif();
+  });
+
+  socket.on('course_annulée', (data) => {
+    if (data.par === 'client') {
+      courseActiveId = null;
+      clientWA = null;
+      document.getElementById('course-active').style.display = 'none';
+      toast('Le client a annulé la course.');
+      changerStatut('libre');
+    }
+  });
+}
+
+function detecterPosition() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.watchPosition(pos => {
+    userLat = pos.coords.latitude;
+    userLng = pos.coords.longitude;
+    if (map) {
+      map.setView([userLat, userLng], 15);
+      if (userMarker) userMarker.setLatLng([userLat, userLng]);
+      else userMarker = L.circleMarker([userLat, userLng], {
+        radius:12, fillColor:'#d97706', color:'#fff', weight:3, fillOpacity:1
+      }).addTo(map).bindPopup('Votre position');
+    }
+    if (socket && enLigne) {
+      socket.emit('position_update', { userId: user.id, lat: userLat, lng: userLng, role: 'chauffeur' });
+      fetch(`${API}/api/chauffeur/position`, {
+        method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+        body: JSON.stringify({ lat: userLat, lng: userLng })
+      }).catch(() => {});
+    }
+  }, () => {
+    userLat = 11.5883; userLng = 43.1456;
+  }, { enableHighAccuracy: true });
+}
+
+// ── STATUT ────────────────────────────────────────────
+async function toggleStatut() {
+  if (courseActiveId) return toast('Terminez la course en cours d\'abord');
+  enLigne = !enLigne;
+  const statut = enLigne ? 'libre' : 'hors_ligne';
+  const btn = document.getElementById('toggle-btn');
+  const label = document.getElementById('statut-label');
+  const sub = document.getElementById('statut-sub');
+  if (enLigne) {
+    btn.className = 'toggle-switch toggle-on';
+    label.textContent = '🟢 Disponible';
+    sub.textContent = 'Les clients peuvent vous voir sur la carte';
+  } else {
+    btn.className = 'toggle-switch toggle-off';
+    label.textContent = '🔴 Hors ligne';
+    sub.textContent = 'Vous êtes invisible pour les clients';
+    document.getElementById('demandes-list').innerHTML = `<div class="empty-state"><div class="emoji">😴</div><p>Vous êtes hors ligne. Repassez en ligne pour recevoir des courses.</p></div>`;
+  }
+  await changerStatut(statut);
+}
+
+async function changerStatut(statut) {
+  try {
+    await fetch(`${API}/api/chauffeur/statut`, {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+      body: JSON.stringify({ statut })
+    });
+  } catch {}
+}
+
+// ── DEMANDES ─────────────────────────────────────────
+function afficherDemande(data) {
+  const dist = data.client.lat && userLat
+    ? calcDist(userLat, userLng, data.client.lat, data.client.lng)
+    : null;
+
+  document.getElementById('demandes-list').innerHTML = `
+    <div class="demand-card">
+      <div class="demand-header">
+        <div class="avatar">${data.client.nom.charAt(0).toUpperCase()}</div>
+        <div class="demand-info">
+          <p class="demand-name">${data.client.nom}</p>
+          <p class="demand-meta">📱 ${data.client.whatsapp}</p>
+          ${dist ? `<p class="dist">📍 ${dist < 1 ? Math.round(dist*1000)+'m' : dist.toFixed(1)+'km'} de vous</p>` : ''}
+        </div>
+      </div>
+      <div class="demand-actions">
+        <button class="btn-accept" onclick="repondre('${data.courseId}','accepter','${data.client.nom}')">✅ Accepter</button>
+        <button class="btn-refuse" onclick="repondre('${data.courseId}','refuser','')">❌ Refuser</button>
+      </div>
+    </div>
+  `;
+}
+
+async function repondre(courseId, decision, clientNom) {
+  try {
+    const r = await fetch(`${API}/api/course/repondre`, {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+      body: JSON.stringify({ courseId, decision })
+    });
+    const d = await r.json();
+    if (!r.ok) return toast(d.error);
+
+    if (decision === 'accepter') {
+      courseActiveId = courseId;
+      clientNomCours = clientNom;
+      document.getElementById('client-en-cours').textContent = clientNom;
+      document.getElementById('course-active').style.display = 'block';
+      document.getElementById('demandes-list').innerHTML = `<div class="empty-state"><div class="emoji">🚗</div><p>Course en cours avec ${clientNom}.</p></div>`;
+      coursesAujourd++;
+      document.getElementById('stat-courses').textContent = coursesAujourd;
+      toast('✅ Course acceptée ! En route vers le client.');
+    } else {
+      courseActiveId = null;
+      enLigne = true;
+      document.getElementById('demandes-list').innerHTML = `<div class="empty-state"><div class="emoji">⏳</div><p>En attente de nouvelles demandes...</p></div>`;
+      toast('Course refusée. En attente de la prochaine demande.');
+      await changerStatut('libre');
+    }
+  } catch { toast('Erreur de connexion'); }
+}
+
+async function terminerCourse() {
+  if (!courseActiveId) return;
+  try {
+    const r = await fetch(`${API}/api/course/terminer`, {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+      body: JSON.stringify({ courseId: courseActiveId })
+    });
+    if (!r.ok) return toast('Erreur');
+    courseActiveId = null;
+    clientWA = null;
+    document.getElementById('course-active').style.display = 'none';
+    document.getElementById('demandes-list').innerHTML = `<div class="empty-state"><div class="emoji">⏳</div><p>En attente de nouvelles demandes...</p></div>`;
+    toast('🏁 Course terminée ! Bien joué.');
+    enLigne = true;
+    await changerStatut('libre');
+  } catch { toast('Erreur'); }
+}
+
+// ── NOTIF ─────────────────────────────────────────────
+function afficherNotif() {
+  const b = document.getElementById('notif-banner');
+  b.style.display = 'block';
+  setTimeout(() => { b.style.display = 'none'; }, 5000);
+  try { const a = new AudioContext(); const o = a.createOscillator(); o.connect(a.destination); o.start(); o.stop(a.currentTime + 0.2); } catch {}
+}
+
+// ── UTILS ─────────────────────────────────────────────
+function ouvrirWhatsapp() {
+  if (!clientWA) return toast('Numéro non disponible');
+  const num = clientWA.replace(/\D/g,'');
+  window.open(`https://wa.me/${num}?text=Bonjour, je suis votre chauffeur YalaTaxi, j'arrive !`, '_blank');
+}
+
+function calcDist(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLng = (lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function voirProfil() {
+  toast(`${user.nom} · ${user.plaque || ''} · ⭐ ${user.note || '5.0'}`);
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
 }
 </script>
-
 </body>
 </html>
-``
+
