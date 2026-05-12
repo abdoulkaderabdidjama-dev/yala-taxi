@@ -244,7 +244,7 @@ function switchTab(tab){
   document.getElementById('form-login').style.display=tab==='login'?'block':'none';
   document.getElementById('form-register').style.display=tab==='register'?'block':'none';
   document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(tab==='login'&&i===0)||(tab==='register'&&i===1)));
-  document.getElementById('switch-text').innerHTML=tab==='login'?'Pas encore de compte ? <a onclick="switchTab(\'register\')">S\'inscrire</a>':'Déjà un compte ? <a onclick="switchTab(\'login\')">Se connecter</a>';
+  document.getElementById('switch-text').innerHTML=tab==='login'?'Pas encore de compte ? <a onclick="switchTab( register )">S inscrire</a>':'Déjà un compte ? <a onclick="switchTab( login )">Se connecter</a>';
 }
 
 async function inscription(){
@@ -303,7 +303,7 @@ function initSocket(){
   });
   socket.on('course_refusée',()=>{courseActive=null;document.getElementById('btn-search').disabled=false;toast('❌ Le chauffeur a refusé. Essayez un autre.');});
   socket.on('course_annulée',()=>{courseActive=null;document.getElementById('course-banner').style.display='none';document.getElementById('btn-search').disabled=false;toast('Course annulée par le chauffeur.');rechercherTaxis();});
-  socket.on('course_terminée',()=>{courseActive=null;document.getElementById('course-banner').style.display='none';document.getElementById('btn-search').disabled=false;toast('🏁 Course terminée ! Merci d\'avoir utilisé YalaTaxi.');});
+  socket.on('course_terminée',()=>{courseActive=null;document.getElementById('course-banner').style.display='none';document.getElementById('btn-search').disabled=false;toast('🏁 Course terminée ! Merci d avoir utilisé YalaTaxi.');});
 }
 
 function detecterPosition(){
