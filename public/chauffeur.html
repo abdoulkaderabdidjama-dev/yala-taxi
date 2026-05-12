@@ -122,6 +122,18 @@
   .nav-item.active{color:var(--jaune)}
   .nav-item:not(.active){color:#444}
   .nav-icon{font-size:21px}
+  .histo-topbar{background:var(--noir2);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--bordure);position:sticky;top:0;z-index:10}
+  .histo-back{width:34px;height:34px;border-radius:50%;background:var(--noir3);border:1px solid var(--bordure);color:var(--jaune);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .histo-title{font-size:17px;font-weight:800;color:var(--jaune)}
+  .histo-content{flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+  .course-item{background:var(--noir2);border:1px solid var(--bordure);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:8px}
+  .course-item-header{display:flex;align-items:center;justify-content:space-between}
+  .course-item-nom{font-size:14px;font-weight:700;color:var(--texte)}
+  .course-item-date{font-size:11px;color:var(--muted)}
+  .course-item-detail{font-size:12px;color:var(--muted);display:flex;gap:12px}
+  .histo-empty{text-align:center;padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .histo-empty .emoji{font-size:40px}
+  .histo-empty p{font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -213,9 +225,19 @@
 
   <div class="bottom-nav">
     <button class="nav-item active"><span class="nav-icon">🏠</span>Accueil</button>
-    <button class="nav-item" onclick="toast('Historique — bientôt disponible')"><span class="nav-icon">📋</span>Courses</button>
+    <button class="nav-item" onclick="voirHistorique()"><span class="nav-icon">📋</span>Courses</button>
     <button class="nav-item" onclick="toast('Avis — bientôt disponible')"><span class="nav-icon">⭐</span>Avis</button>
     <button class="nav-item" onclick="voirProfil()"><span class="nav-icon">👤</span>Profil</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-historique">
+  <div class="histo-topbar">
+    <button class="histo-back" onclick="retourAccueil()">←</button>
+    <p class="histo-title">📋 Mes Courses</p>
+  </div>
+  <div class="histo-content" id="histo-content">
+    <div class="histo-empty"><div class="emoji">⏳</div><p>Chargement...</p></div>
   </div>
 </div>
 
@@ -404,6 +426,42 @@ function calcDist(lat1,lng1,lat2,lng2){
   return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
 
+function voirHistorique(){
+  document.getElementById('screen-home').classList.remove('active');
+  document.getElementById('screen-historique').classList.add('active');
+  chargerHistorique();
+}
+function retourAccueil(){
+  document.getElementById('screen-historique').classList.remove('active');
+  document.getElementById('screen-home').classList.add('active');
+}
+async function chargerHistorique(){
+  const div=document.getElementById('histo-content');
+  div.innerHTML='<div class="histo-empty"><div class="emoji">⏳</div><p>Chargement...</p></div>';
+  try{
+    const r=await fetch(`${API}/api/mes-courses`,{headers:{'Authorization':`Bearer ${token}`}});
+    const courses=await r.json();
+    if(!courses.length){
+      div.innerHTML='<div class="histo-empty"><div class="emoji">🚗</div><p>Vous n'avez pas encore de courses.<br>Passez en ligne pour commencer !</p></div>';
+      return;
+    }
+    const emojis={terminée:'✅',annulée:'❌',en_attente:'⏳',acceptée:'🚗',refusée:'⛔'};
+    const labels={terminée:'Terminée',annulée:'Annulée',en_attente:'En attente',acceptée:'Acceptée',refusée:'Refusée'};
+    div.innerHTML=courses.map(c=>{
+      const date=new Date(c.createdAt).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      const emoji=emojis[c.statut]||'🚗';
+      const label=labels[c.statut]||c.statut;
+      const color=c.statut==='terminée'?'var(--vert)':c.statut==='annulée'?'var(--rouge)':'var(--jaune)';
+      return `<div class="course-item">
+        <div class="course-item-header">
+          <p class="course-item-nom">👤 ${c.clientNom||'Client'}</p>
+          <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.05);color:${color}">${emoji} ${label}</span>
+        </div>
+        <p class="course-item-date">📅 ${date}</p>
+      </div>`;
+    }).join('');
+  }catch{div.innerHTML='<div class="histo-empty"><div class="emoji">❌</div><p>Erreur de chargement.</p></div>';}
+}
 function voirProfil(){toast(`${user.nom} · ${user.plaque||''} · ⭐ ${user.note||'5.0'}`);}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
 </script>
