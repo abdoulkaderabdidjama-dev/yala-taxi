@@ -257,7 +257,7 @@ function switchTab(tab){
   document.getElementById('form-login').style.display=tab==='login'?'block':'none';
   document.getElementById('form-register').style.display=tab==='register'?'block':'none';
   document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(tab==='login'&&i===0)||(tab==='register'&&i===1)));
-  document.getElementById('switch-text').innerHTML=tab==='login'?'Pas encore de compte ? <a onclick="switchTab(\'register\')">S\'inscrire</a>':'Déjà un compte ? <a onclick="switchTab(\'login\')">Se connecter</a>';
+  document.getElementById('switch-text').innerHTML=tab==='login'?'Pas encore de compte ? <a onclick="switchTab( register )">S inscrire</a>':'Déjà un compte ? <a onclick="switchTab( login )">Se connecter</a>';
 }
 
 async function inscription(){
@@ -334,7 +334,7 @@ function detecterPosition(){
 }
 
 async function toggleStatut(){
-  if(courseActiveId) return toast('Terminez la course en cours d\'abord');
+  if(courseActiveId) return toast('Terminez la course en cours d abord');
   enLigne=!enLigne;
   const statut=enLigne?'libre':'hors_ligne';
   const btn=document.getElementById('toggle-btn');
