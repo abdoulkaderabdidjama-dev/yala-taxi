@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>YalaTaxi — Récupérer mon mot de passe</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(160deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 24px;
+    gap: 20px;
+  }
+
+  .logo { font-size: 56px; animation: bounce 2s infinite; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+  .title { font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+  .subtitle { font-size: 14px; color: rgba(255,255,255,0.7); text-align: center; max-width: 300px; line-height: 1.5; }
+
+  .card {
+    background: #fff; border-radius: 24px; padding: 28px 24px;
+    width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+
+  .card-title { font-size: 20px; font-weight: 800; color: #0f172a; }
+  .card-sub { font-size: 13px; color: #64748b; line-height: 1.5; margin-top: -8px; }
+
+  .step {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: #f8fafc; border-radius: 12px; padding: 12px;
+  }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #2563eb; color: #fff; font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .step-text { font-size: 13px; color: #475569; line-height: 1.5; }
+  .step-text strong { color: #0f172a; }
+
+  .divider { height: 1px; background: #e2e8f0; }
+
+  .inp {
+    width: 100%; padding: 14px 16px; border: 1.5px solid #e2e8f0;
+    border-radius: 12px; font-size: 15px; outline: none;
+    transition: border-color 0.2s; font-family: inherit; color: #0f172a;
+    background: #f8fafc;
+  }
+  .inp:focus { border-color: #2563eb; background: #fff; }
+  .inp::placeholder { color: #94a3b8; }
+
+  .label { font-size: 13px; font-weight: 600; color: #374151; }
+
+  .btn {
+    width: 100%; padding: 15px; border: none; border-radius: 12px;
+    font-size: 16px; font-weight: 700; cursor: pointer;
+    font-family: inherit; transition: all 0.15s;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-blue { background: #2563eb; color: #fff; }
+  .btn-blue:hover { background: #1d4ed8; }
+  .btn-blue:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+  .back-link {
+    font-size: 14px; color: rgba(255,255,255,0.8); text-align: center;
+    cursor: pointer; text-decoration: underline;
+  }
+
+  /* Messages */
+  .msg {
+    padding: 12px 16px; border-radius: 12px; font-size: 14px;
+    font-weight: 500; display: none;
+  }
+  .msg-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+  .msg-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+  .msg.show { display: block; }
+
+  /* Succès */
+  .success-screen {
+    display: none; flex-direction: column; align-items: center;
+    gap: 16px; text-align: center;
+  }
+  .success-screen.show { display: flex; }
+  .success-icon { font-size: 64px; }
+  .success-title { font-size: 22px; font-weight: 800; color: #fff; }
+  .success-sub { font-size: 14px; color: rgba(255,255,255,0.8); }
+
+  .loader {
+    display: inline-block; width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+    vertical-align: middle; margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .pw-strength {
+    height: 4px; border-radius: 2px; margin-top: -8px;
+    transition: all 0.3s; background: #e2e8f0;
+  }
+  .pw-label { font-size: 11px; color: #94a3b8; margin-top: -4px; }
+</style>
+</head>
+<body>
+
+<div class="logo">🔑</div>
+<div class="title">YalaTaxi</div>
+<div class="subtitle">Récupérez l'accès à votre compte en quelques secondes</div>
+
+<!-- FORMULAIRE -->
+<div class="card" id="form-card">
+  <p class="card-title">Mot de passe oublié ?</p>
+  <p class="card-sub">Entrez votre numéro WhatsApp et choisissez un nouveau mot de passe.</p>
+
+  <!-- Étapes visuelles -->
+  <div class="step">
+    <div class="step-num">1</div>
+    <p class="step-text"><strong>Entrez votre numéro WhatsApp</strong> — celui que vous avez utilisé pour créer votre compte.</p>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <p class="step-text"><strong>Choisissez un nouveau mot de passe</strong> — minimum 6 caractères.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div>
+    <p class="label">Votre numéro WhatsApp</p>
+    <input class="inp" id="inp-wa" type="tel" placeholder="+253 77 XX XX XX" />
+  </div>
+
+  <div>
+    <p class="label">Nouveau mot de passe</p>
+    <input class="inp" id="inp-pw" type="password" placeholder="Minimum 6 caractères" oninput="checkStrength()" />
+    <div class="pw-strength" id="pw-strength"></div>
+    <p class="pw-label" id="pw-label"></p>
+  </div>
+
+  <div>
+    <p class="label">Confirmer le mot de passe</p>
+    <input class="inp" id="inp-pw2" type="password" placeholder="Retapez votre mot de passe" />
+  </div>
+
+  <div class="msg msg-error" id="msg-error"></div>
+  <div class="msg msg-success" id="msg-success"></div>
+
+  <button class="btn btn-blue" id="btn-reset" onclick="resetPassword()">
+    Changer mon mot de passe
+  </button>
+</div>
+
+<!-- SUCCÈS -->
+<div class="success-screen" id="success-screen">
+  <div class="success-icon">✅</div>
+  <div class="success-title">Mot de passe mis à jour !</div>
+  <div class="success-sub">Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.</div>
+  <button class="btn btn-blue" style="max-width:300px;width:100%;" onclick="retourConnexion()">
+    Se connecter maintenant →
+  </button>
+</div>
+
+<p class="back-link" onclick="history.back()">← Retour à la connexion</p>
+
+<script>
+const API = 'https://yala-taxi.onrender.com';
+
+function checkStrength() {
+  const pw = document.getElementById('inp-pw').value;
+  const bar = document.getElementById('pw-strength');
+  const label = document.getElementById('pw-label');
+
+  if (pw.length === 0) { bar.style.background = '#e2e8f0'; bar.style.width = '0%'; label.textContent = ''; return; }
+
+  let score = 0;
+  if (pw.length >= 6) score++;
+  if (pw.length >= 10) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[!@#$%^&*]/.test(pw)) score++;
+
+  const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e'];
+  const labels = ['Trop court', 'Faible', 'Moyen', 'Fort 💪'];
+  const widths = ['25%', '50%', '75%', '100%'];
+
+  bar.style.background = colors[score - 1] || '#e2e8f0';
+  bar.style.width = widths[score - 1] || '10%';
+  label.textContent = labels[score - 1] || '';
+  label.style.color = colors[score - 1] || '#94a3b8';
+}
+
+async function resetPassword() {
+  const whatsapp = document.getElementById('inp-wa').value.trim();
+  const pw = document.getElementById('inp-pw').value;
+  const pw2 = document.getElementById('inp-pw2').value;
+  const btn = document.getElementById('btn-reset');
+  const errDiv = document.getElementById('msg-error');
+  const okDiv = document.getElementById('msg-success');
+
+  errDiv.classList.remove('show');
+  okDiv.classList.remove('show');
+
+  // Validations
+  if (!whatsapp) return showError('Entrez votre numéro WhatsApp');
+  if (!pw) return showError('Entrez un nouveau mot de passe');
+  if (pw.length < 6) return showError('Le mot de passe doit faire au moins 6 caractères');
+  if (pw !== pw2) return showError('Les deux mots de passe ne correspondent pas');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>Mise à jour...';
+
+  try {
+    const r = await fetch(`${API}/api/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ whatsapp, nouveau_password: pw })
+    });
+    const d = await r.json();
+
+    if (!r.ok) {
+      showError(d.error || 'Erreur serveur');
+      btn.disabled = false;
+      btn.textContent = 'Changer mon mot de passe';
+      return;
+    }
+
+    // Succès !
+    document.getElementById('form-card').style.display = 'none';
+    document.getElementById('success-screen').classList.add('show');
+
+  } catch {
+    showError('Impossible de contacter le serveur. Vérifiez votre connexion.');
+    btn.disabled = false;
+    btn.textContent = 'Changer mon mot de passe';
+  }
+}
+
+function showError(msg) {
+  const div = document.getElementById('msg-error');
+  div.textContent = '❌ ' + msg;
+  div.classList.add('show');
+}
+
+function retourConnexion() {
+  // Retourne à la dernière page visitée (client ou chauffeur)
+  const ref = document.referrer;
+  if (ref.includes('chauffeur')) {
+    window.location.href = 'chauffeur.html';
+  } else {
+    window.location.href = 'client.html';
+  }
+}
+</script>
+</body>
+</html>
