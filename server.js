@@ -107,6 +107,22 @@ app.post('/api/connexion', async (req, res) => {
   } catch(err) { res.status(500).json({ error: 'Erreur serveur' }); }
 });
 
+// ─── RESET MOT DE PASSE ────────────────────────────────────────────────────
+app.post("/api/reset-password", async (req, res) => {
+  const { whatsapp, nouveau_password } = req.body;
+  if (!whatsapp || !nouveau_password)
+    return res.status(400).json({ error: "Numéro WhatsApp et nouveau mot de passe requis" });
+  if (nouveau_password.length < 6)
+    return res.status(400).json({ error: "Le mot de passe doit faire au moins 6 caractères" });
+  try {
+    const user = await User.findOne({ whatsapp });
+    if (!user) return res.status(404).json({ error: "Aucun compte trouvé avec ce numéro WhatsApp" });
+    user.password_hash = await bcrypt.hash(nouveau_password, 10);
+    await user.save();
+    res.json({ ok: true, message: "Mot de passe mis à jour avec succès !" });
+  } catch(err) { res.status(500).json({ error: "Erreur serveur" }); }
+});
+
 // ─── CHAUFFEURS ────────────────────────────────────────────────────────────
 app.post('/api/chauffeur/position', authMiddleware, async (req, res) => {
   if (req.user.role!=='chauffeur') return res.status(403).json({ error: 'Réservé aux chauffeurs' });
