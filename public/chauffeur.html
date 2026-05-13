@@ -8,462 +8,485 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  :root{
-    --jaune:#f59e0b;
-    --jaune-dark:#d97706;
-    --jaune-light:rgba(245,158,11,0.12);
-    --noir:#0a0a0a;
-    --noir2:#111111;
-    --noir3:#1a1a1a;
-    --bordure:#2a2a2a;
-    --texte:#ffffff;
-    --muted:#666666;
-    --vert:#4ade80;
-    --rouge:#f87171;
-    --radius:14px;
-  }
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--noir);color:var(--texte);min-height:100vh}
-  .screen{display:none;min-height:100vh;flex-direction:column}
-  .screen.active{display:flex}
-
-  /* AUTH */
-  #screen-auth{background:var(--noir);align-items:center;justify-content:center;padding:32px 24px;gap:20px}
-  .auth-logo{font-size:56px;animation:bounce 2s infinite}
-  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-  .auth-title{font-size:32px;font-weight:800;color:var(--jaune);letter-spacing:-1px}
-  .auth-sub{font-size:13px;color:var(--muted);text-align:center}
-  .auth-badge{background:var(--jaune-light);border:1px solid rgba(245,158,11,0.3);color:var(--jaune);font-size:11px;font-weight:700;padding:5px 16px;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase}
-  .auth-card{background:var(--noir2);border:1px solid var(--bordure);border-radius:22px;padding:22px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:12px}
-  .auth-tabs{display:flex;background:var(--noir3);border-radius:10px;padding:3px;gap:3px}
-  .auth-tab{flex:1;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;font-family:inherit}
-  .auth-tab.active{background:var(--jaune);color:#000}
-  .auth-tab:not(.active){background:transparent;color:var(--muted)}
-  .inp{width:100%;padding:13px 15px;border:1.5px solid var(--bordure);border-radius:11px;font-size:14px;outline:none;transition:border-color 0.2s;font-family:inherit;color:var(--texte);background:var(--noir3)}
-  .inp:focus{border-color:var(--jaune)}
-  .inp::placeholder{color:#444}
-  .btn{width:100%;padding:14px;border:none;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;transition:all 0.15s;font-family:inherit}
-  .btn:active{transform:scale(0.98)}
-  .btn-jaune{background:var(--jaune);color:#000}
-  .btn-jaune:hover{background:var(--jaune-dark)}
-  .btn-outline{background:transparent;color:var(--jaune);border:1.5px solid var(--jaune)}
-  .btn-rouge{background:rgba(239,68,68,0.15);color:var(--rouge);border:1px solid rgba(239,68,68,0.3)}
-  .auth-switch{font-size:12px;color:var(--muted);text-align:center}
-  .auth-switch a{color:var(--jaune);font-weight:700;cursor:pointer;text-decoration:none}
-  .forgot{font-size:12px;color:var(--jaune);text-align:center;font-weight:700;cursor:pointer}
-  .forgot:hover{text-decoration:underline}
-
-  /* ACCUEIL */
-  #screen-home{background:var(--noir)}
-  .topbar{background:var(--noir2);color:var(--texte);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--bordure)}
-  .topbar-greeting{font-size:11px;color:var(--muted)}
-  .topbar-name{font-size:17px;font-weight:800;color:var(--jaune)}
-  .icon-btn{width:36px;height:36px;border-radius:50%;background:var(--noir3);border:1px solid var(--bordure);color:var(--texte);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-  #map{height:220px;width:100%;z-index:1}
-  .content{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;background:var(--noir)}
-  .section-title{font-size:11px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.8px}
-
-  /* Toggle */
-  .toggle-card{background:var(--noir2);border:1px solid var(--bordure);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
-  .toggle-title{font-size:15px;font-weight:700;color:var(--texte)}
-  .toggle-sub{font-size:11px;color:var(--muted);margin-top:2px}
-  .toggle-switch{width:50px;height:27px;border-radius:14px;border:none;cursor:pointer;position:relative;transition:background 0.3s;flex-shrink:0}
-  .toggle-switch::after{content:'';position:absolute;width:21px;height:21px;border-radius:50%;background:#000;top:3px;transition:left 0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.5)}
-  .toggle-on{background:var(--jaune)}
-  .toggle-on::after{left:26px}
-  .toggle-off{background:var(--noir3)}
-  .toggle-off::after{left:3px}
-
-  /* Stats */
-  .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .stat-card{background:var(--noir2);border:1px solid var(--bordure);border-radius:var(--radius);padding:13px;text-align:center}
-  .stat-value{font-size:22px;font-weight:800;color:var(--jaune)}
-  .stat-label{font-size:10px;color:var(--muted);margin-top:2px}
-
-  /* Demande client */
-  .demand-card{background:var(--noir2);border:2px solid rgba(245,158,11,0.4);border-radius:var(--radius);padding:13px;display:flex;flex-direction:column;gap:10px;animation:pulse-border 2s infinite}
-  @keyframes pulse-border{0%,100%{border-color:rgba(245,158,11,0.4)}50%{border-color:rgba(245,158,11,0.8)}}
-  .demand-header{display:flex;align-items:center;gap:10px}
-  .avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;flex-shrink:0;background:rgba(255,255,255,0.05);color:var(--texte);border:1px solid var(--bordure)}
-  .demand-name{font-size:14px;font-weight:700;color:var(--jaune)}
-  .demand-meta{font-size:11px;color:var(--muted);margin-top:2px}
-  .dist{font-size:11px;color:var(--jaune);font-weight:600}
-  .demand-actions{display:flex;gap:10px}
-  .btn-accept{flex:1;padding:13px;background:var(--jaune);color:#000;border:none;border-radius:11px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
-  .btn-refuse{flex:1;padding:13px;background:rgba(239,68,68,0.1);color:var(--rouge);border:1px solid rgba(239,68,68,0.3);border-radius:11px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
-
-  /* Course active */
-  .course-active-card{background:var(--noir2);border:1px solid rgba(74,222,128,0.3);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:10px}
-  .course-active-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--vert)}
-  .course-active-name{font-size:17px;font-weight:800;color:var(--jaune)}
-  .progress-bar{height:3px;background:var(--noir3);border-radius:2px;overflow:hidden}
-  .progress-fill{height:100%;background:var(--jaune);border-radius:2px;animation:prog 3s ease-in-out infinite alternate}
-  @keyframes prog{0%{width:20%}100%{width:90%}}
-  .course-btns{display:flex;gap:8px}
-  .btn-wa-course{flex:1;padding:10px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.2);color:#25d366;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
-  .btn-finish{flex:1;padding:10px;background:var(--jaune);color:#000;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
-
-  /* Etat vide */
-  .empty-state{background:var(--noir2);border:1px solid var(--bordure);border-radius:var(--radius);padding:22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
-  .empty-state .emoji{font-size:34px}
-  .empty-state p{font-size:13px;color:var(--muted)}
-
-  /* Notif */
-  .notif-banner{position:fixed;top:70px;left:16px;right:16px;background:var(--jaune);color:#000;border-radius:var(--radius);padding:13px 16px;z-index:500;font-weight:800;font-size:14px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.4);animation:slideDown 0.3s ease;display:none}
-  @keyframes slideDown{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
-
-  /* Toast */
-  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--noir2);color:var(--texte);border:1px solid var(--bordure);padding:11px 18px;border-radius:11px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity 0.3s;white-space:nowrap;pointer-events:none;max-width:90vw;text-align:center}
-  .toast.show{opacity:1}
-
-  /* Nav */
-  .bottom-nav{display:flex;background:var(--noir2);border-top:1px solid var(--bordure);position:sticky;bottom:0;z-index:100}
-  .nav-item{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:inherit;font-size:9px;font-weight:600}
-  .nav-item.active{color:var(--jaune)}
-  .nav-item:not(.active){color:#444}
-  .nav-icon{font-size:21px}
-  .histo-topbar{background:var(--noir2);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--bordure);position:sticky;top:0;z-index:10}
-  .histo-back{width:34px;height:34px;border-radius:50%;background:var(--noir3);border:1px solid var(--bordure);color:var(--jaune);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-  .histo-title{font-size:17px;font-weight:800;color:var(--jaune)}
-  .histo-content{flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
-  .course-item{background:var(--noir2);border:1px solid var(--bordure);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:8px}
-  .course-item-header{display:flex;align-items:center;justify-content:space-between}
-  .course-item-nom{font-size:14px;font-weight:700;color:var(--texte)}
-  .course-item-date{font-size:11px;color:var(--muted)}
-  .course-item-detail{font-size:12px;color:var(--muted);display:flex;gap:12px}
-  .histo-empty{text-align:center;padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:12px}
-  .histo-empty .emoji{font-size:40px}
-  .histo-empty p{font-size:13px;color:var(--muted)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--j:#f59e0b;--jd:#d97706;--jl:rgba(245,158,11,0.12);--n:#0a0a0a;--n2:#111111;--n3:#1a1a1a;--b:#2a2a2a;--t:#ffffff;--m:#666666;--v:#4ade80;--r:#f87171;--rad:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--n);color:var(--t);min-height:100vh}
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+#screen-auth{background:var(--n);align-items:center;justify-content:center;padding:32px 24px;gap:20px}
+.logo{font-size:56px;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.titre{font-size:32px;font-weight:800;color:var(--j);letter-spacing:-1px}
+.sous{font-size:13px;color:var(--m);text-align:center}
+.badge{background:var(--jl);border:1px solid rgba(245,158,11,0.3);color:var(--j);font-size:11px;font-weight:700;padding:5px 16px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px}
+.card{background:var(--n2);border:1px solid var(--b);border-radius:22px;padding:22px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:12px}
+.tabs{display:flex;background:var(--n3);border-radius:10px;padding:3px;gap:3px}
+.tab{flex:1;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;font-family:inherit;background:transparent;color:var(--m)}
+.tab.on{background:var(--j);color:#000}
+.inp{width:100%;padding:13px 15px;border:1.5px solid var(--b);border-radius:11px;font-size:14px;outline:none;transition:border-color 0.2s;font-family:inherit;color:var(--t);background:var(--n3)}
+.inp:focus{border-color:var(--j)}
+.inp::placeholder{color:#444}
+.btn{width:100%;padding:14px;border:none;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;transition:all 0.15s;font-family:inherit}
+.btn:active{transform:scale(0.98)}
+.bj{background:var(--j);color:#000}
+.bo{background:transparent;color:var(--j);border:1.5px solid var(--j)}
+.br{background:rgba(239,68,68,0.15);color:var(--r);border:1px solid rgba(239,68,68,0.3)}
+.lnk{font-size:12px;color:var(--m);text-align:center}
+.lnk a{color:var(--j);font-weight:700;cursor:pointer;text-decoration:none}
+.forgot{font-size:12px;color:var(--j);text-align:center;font-weight:700;cursor:pointer}
+#screen-home{background:var(--n)}
+.topbar{background:var(--n2);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--b)}
+.topbar-g{font-size:11px;color:var(--m)}
+.topbar-n{font-size:17px;font-weight:800;color:var(--j)}
+.ibtn{width:36px;height:36px;border-radius:50%;background:var(--n3);border:1px solid var(--b);color:var(--t);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#map{height:220px;width:100%;z-index:1}
+.cnt{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.sec{font-size:11px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.8px}
+.tog-card{background:var(--n2);border:1px solid var(--b);border-radius:var(--rad);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
+.tog-t{font-size:15px;font-weight:700;color:var(--t)}
+.tog-s{font-size:11px;color:var(--m);margin-top:2px}
+.tog-sw{width:50px;height:27px;border-radius:14px;border:none;cursor:pointer;position:relative;transition:background 0.3s;flex-shrink:0}
+.tog-sw::after{content:"";position:absolute;width:21px;height:21px;border-radius:50%;background:#000;top:3px;transition:left 0.3s}
+.ton{background:var(--j)}.ton::after{left:26px}
+.toff{background:var(--n3)}.toff::after{left:3px}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.scard{background:var(--n2);border:1px solid var(--b);border-radius:var(--rad);padding:13px;text-align:center}
+.sval{font-size:22px;font-weight:800;color:var(--j)}
+.slbl{font-size:10px;color:var(--m);margin-top:2px}
+.dcard{background:var(--n2);border:2px solid rgba(245,158,11,0.4);border-radius:var(--rad);padding:13px;display:flex;flex-direction:column;gap:10px;animation:pb 2s infinite}
+@keyframes pb{0%,100%{border-color:rgba(245,158,11,0.4)}50%{border-color:rgba(245,158,11,0.8)}}
+.dhead{display:flex;align-items:center;gap:10px}
+.av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;flex-shrink:0;background:rgba(255,255,255,0.05);color:var(--t);border:1px solid var(--b)}
+.dnom{font-size:14px;font-weight:700;color:var(--j)}
+.dmeta{font-size:11px;color:var(--m);margin-top:2px}
+.ddist{font-size:11px;color:var(--j);font-weight:600}
+.dact{display:flex;gap:10px}
+.bacc{flex:1;padding:13px;background:var(--j);color:#000;border:none;border-radius:11px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
+.bref{flex:1;padding:13px;background:rgba(239,68,68,0.1);color:var(--r);border:1px solid rgba(239,68,68,0.3);border-radius:11px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
+.cacard{background:var(--n2);border:1px solid rgba(74,222,128,0.3);border-radius:var(--rad);padding:14px;display:flex;flex-direction:column;gap:10px}
+.cat{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--v)}
+.can{font-size:17px;font-weight:800;color:var(--j)}
+.pb{height:3px;background:var(--n3);border-radius:2px;overflow:hidden}
+.pf{height:100%;background:var(--j);border-radius:2px;animation:pa 3s ease-in-out infinite alternate}
+@keyframes pa{0%{width:20%}100%{width:90%}}
+.cbtns{display:flex;gap:8px}
+.bwa{flex:1;padding:10px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.2);color:#25d366;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.bfin{flex:1;padding:10px;background:var(--j);color:#000;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
+.empty{background:var(--n2);border:1px solid var(--b);border-radius:var(--rad);padding:22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.empty .em{font-size:34px}
+.empty p{font-size:13px;color:var(--m)}
+.notif{position:fixed;top:70px;left:16px;right:16px;background:var(--j);color:#000;border-radius:var(--rad);padding:13px 16px;z-index:500;font-weight:800;font-size:14px;text-align:center;animation:sd 0.3s ease;display:none}
+@keyframes sd{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--n2);color:var(--t);border:1px solid var(--b);padding:11px 18px;border-radius:11px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;max-width:90vw;text-align:center;white-space:nowrap}
+.toast.show{opacity:1}
+.bnav{display:flex;background:var(--n2);border-top:1px solid var(--b);position:sticky;bottom:0;z-index:100}
+.ni{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:inherit;font-size:9px;font-weight:600;color:#444}
+.ni.on{color:var(--j)}
+.nico{font-size:21px}
+.htop{background:var(--n2);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--b);position:sticky;top:0;z-index:10}
+.hbk{width:34px;height:34px;border-radius:50%;background:var(--n3);border:1px solid var(--b);color:var(--j);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.htit{font-size:17px;font-weight:800;color:var(--j)}
+.hcnt{flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.ci{background:var(--n2);border:1px solid var(--b);border-radius:var(--rad);padding:14px;display:flex;flex-direction:column;gap:6px}
+.cih{display:flex;align-items:center;justify-content:space-between}
+.cin{font-size:14px;font-weight:700;color:var(--t)}
+.cid{font-size:11px;color:var(--m)}
 </style>
 </head>
 <body>
 
 <div class="screen active" id="screen-auth">
-  <div class="auth-logo">🚗</div>
-  <div class="auth-title">YalaTaxi</div>
-  <div class="auth-sub">Trouvez des clients autour de vous à Djibouti</div>
-  <span class="auth-badge">Espace Chauffeur</span>
-  <div class="auth-card">
-    <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchTab('login')">Se connecter</button>
-      <button class="auth-tab" onclick="switchTab('register')">S'inscrire</button>
+  <div class="logo">🚗</div>
+  <div class="titre">YalaTaxi</div>
+  <div class="sous">Trouvez des clients autour de vous a Djibouti</div>
+  <span class="badge">Espace Chauffeur</span>
+  <div class="card">
+    <div class="tabs">
+      <button class="tab on" id="tab-login" onclick="switchTab('login')">Se connecter</button>
+      <button class="tab" id="tab-reg" onclick="switchTab('register')">S inscrire</button>
     </div>
     <div id="form-login">
       <div style="display:flex;flex-direction:column;gap:10px">
-        <input class="inp" id="login-wa" type="tel" placeholder="Numéro WhatsApp (+253...)" />
-        <input class="inp" id="login-pw" type="password" placeholder="Mot de passe" />
-        <button class="btn btn-jaune" onclick="connexion()">Se connecter →</button>
-        <p class="forgot" onclick="window.location.href='reset.html'">🔑 Mot de passe oublié ?</p>
+        <input class="inp" id="login-wa" type="tel" placeholder="Numero WhatsApp (+253...)">
+        <input class="inp" id="login-pw" type="password" placeholder="Mot de passe">
+        <button class="btn bj" onclick="connexion()">Se connecter</button>
+        <p class="forgot" onclick="window.location.href='reset.html'">🔑 Mot de passe oublie ?</p>
       </div>
     </div>
-    <div id="form-register" style="display:none">
+    <div id="form-reg" style="display:none">
       <div style="display:flex;flex-direction:column;gap:10px">
-        <input class="inp" id="reg-nom" type="text" placeholder="Votre prénom" />
-        <input class="inp" id="reg-wa" type="tel" placeholder="Numéro WhatsApp (+253...)" />
-        <input class="inp" id="reg-plaque" type="text" placeholder="Plaque d'immatriculation (ex: DJ 1234 AB)" />
-        <input class="inp" id="reg-pw" type="password" placeholder="Créer un mot de passe" />
-        <button class="btn btn-jaune" onclick="inscription()">Créer mon compte →</button>
+        <input class="inp" id="reg-nom" type="text" placeholder="Votre prenom">
+        <input class="inp" id="reg-wa" type="tel" placeholder="Numero WhatsApp (+253...)">
+        <input class="inp" id="reg-plaque" type="text" placeholder="Plaque (ex: DJ 1234 AB)">
+        <input class="inp" id="reg-pw" type="password" placeholder="Creer un mot de passe">
+        <button class="btn bj" onclick="inscription()">Creer mon compte</button>
       </div>
     </div>
-    <p class="auth-switch" id="switch-text">Pas encore de compte ? <a onclick="switchTab('register')">S'inscrire</a></p>
-    <p class="auth-switch">Vous êtes client ? <a href="client.html">Espace client →</a></p>
+    <p class="lnk" id="lnk-switch">Pas de compte ? <a onclick="switchTab('register')">S inscrire</a></p>
+    <p class="lnk">Vous etes client ? <a href="client.html">Espace client</a></p>
   </div>
 </div>
 
 <div class="screen" id="screen-home">
   <div class="topbar">
     <div>
-      <p class="topbar-greeting">Bonne journée 🚗</p>
-      <p class="topbar-name" id="topbar-name">Mohamed</p>
+      <p class="topbar-g">Bonne journee 🚗</p>
+      <p class="topbar-n" id="tnom">Mohamed</p>
     </div>
-    <button class="icon-btn" onclick="deconnexion()">🚪</button>
+    <button class="ibtn" onclick="deconnexion()">🚪</button>
   </div>
-
-  <div class="notif-banner" id="notif-banner">🔔 Nouvelle demande client !</div>
+  <div class="notif" id="notif">🔔 Nouvelle demande client !</div>
   <div id="map"></div>
-
-  <div class="content">
-    <div class="toggle-card" onclick="toggleStatut()">
+  <div class="cnt">
+    <div class="tog-card" onclick="toggleStatut()">
       <div>
-        <p class="toggle-title" id="statut-label">🟢 Disponible</p>
-        <p class="toggle-sub" id="statut-sub">Les clients peuvent vous voir sur la carte</p>
+        <p class="tog-t" id="tog-lbl">🟢 Disponible</p>
+        <p class="tog-s" id="tog-sub">Les clients peuvent vous voir</p>
       </div>
-      <button class="toggle-switch toggle-on" id="toggle-btn" aria-label="Changer statut"></button>
+      <button class="tog-sw ton" id="tog-btn"></button>
     </div>
-
-    <div class="stats-grid">
-      <div class="stat-card">
-        <p class="stat-value" id="stat-courses">0</p>
-        <p class="stat-label">Courses aujourd'hui</p>
-      </div>
-      <div class="stat-card">
-        <p class="stat-value">⭐ <span id="stat-note">5.0</span></p>
-        <p class="stat-label">Note moyenne</p>
-      </div>
+    <div class="sgrid">
+      <div class="scard"><p class="sval" id="nb-courses">0</p><p class="slbl">Courses aujourd hui</p></div>
+      <div class="scard"><p class="sval">⭐ <span id="ma-note">5.0</span></p><p class="slbl">Note moyenne</p></div>
     </div>
-
     <div id="course-active" style="display:none">
-      <div class="course-active-card">
-        <p class="course-active-title">🚖 Course acceptée</p>
-        <p class="course-active-name" id="client-en-cours">—</p>
-        <div class="progress-bar"><div class="progress-fill"></div></div>
-        <div class="course-btns">
-          <button class="btn-wa-course" onclick="ouvrirWhatsapp()">📞 WhatsApp</button>
-          <button class="btn-finish" onclick="terminerCourse()">✅ Terminer</button>
+      <div class="cacard">
+        <p class="cat">🚖 Course acceptee</p>
+        <p class="can" id="client-nom">—</p>
+        <div class="pb"><div class="pf"></div></div>
+        <div class="cbtns">
+          <button class="bwa" onclick="ouvrirWA()">📞 WhatsApp</button>
+          <button class="bfin" onclick="terminerCourse()">✅ Terminer</button>
         </div>
       </div>
     </div>
-
-    <p class="section-title">Demandes clients</p>
-    <div id="demandes-list">
-      <div class="empty-state">
-        <div class="emoji">⏳</div>
-        <p id="empty-msg">Passez en ligne pour recevoir des demandes de clients proches de vous.</p>
-      </div>
-    </div>
+    <p class="sec">Demandes clients</p>
+    <div id="demandes"></div>
   </div>
-
-  <div class="bottom-nav">
-    <button class="nav-item active"><span class="nav-icon">🏠</span>Accueil</button>
-    <button class="nav-item" onclick="voirHistorique()"><span class="nav-icon">📋</span>Courses</button>
-    <button class="nav-item" onclick="toast('Avis — bientôt disponible')"><span class="nav-icon">⭐</span>Avis</button>
-    <button class="nav-item" onclick="voirProfil()"><span class="nav-icon">👤</span>Profil</button>
+  <div class="bnav">
+    <button class="ni on" onclick="retourAccueil()"><span class="nico">🏠</span>Accueil</button>
+    <button class="ni" onclick="voirHisto()"><span class="nico">📋</span>Courses</button>
+    <button class="ni" onclick="voirAvis()"><span class="nico">⭐</span>Avis</button>
+    <button class="ni" onclick="voirProfil()"><span class="nico">👤</span>Profil</button>
   </div>
 </div>
 
-<div class="screen" id="screen-historique">
-  <div class="histo-topbar">
-    <button class="histo-back" onclick="retourAccueil()">←</button>
-    <p class="histo-title">📋 Mes Courses</p>
+<div class="screen" id="screen-histo">
+  <div class="htop">
+    <button class="hbk" onclick="retourAccueil()">←</button>
+    <p class="htit">📋 Mes Courses</p>
   </div>
-  <div class="histo-content" id="histo-content">
-    <div class="histo-empty"><div class="emoji">⏳</div><p>Chargement...</p></div>
+  <div class="hcnt" id="histo-list">
+    <div class="empty"><div class="em">⏳</div><p>Chargement...</p></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const API='https://yala-taxi.onrender.com';
-let token=localStorage.getItem('yt_token');
-let user=JSON.parse(localStorage.getItem('yt_user')||'null');
-let socket=null,map=null,userMarker=null;
-let userLat=null,userLng=null,enLigne=true,courseActiveId=null,clientWA=null;
-let coursesAujourd=0;
+var API = "https://yala-taxi.onrender.com";
+var token = localStorage.getItem("yt_token");
+var user = JSON.parse(localStorage.getItem("yt_user") || "null");
+var socket = null, map = null, userMarker = null;
+var userLat = null, userLng = null, enLigne = true;
+var courseActiveId = null, clientWA = null, nbCourses = 0;
 
-window.onload=()=>{ if(token&&user&&user.role==='chauffeur') afficherAccueil(); };
+window.onload = function() {
+  if (token && user && user.role === "chauffeur") {
+    afficherAccueil();
+  } else {
+    afficherDemandes("vide");
+  }
+};
 
-function switchTab(tab){
-  document.getElementById('form-login').style.display=tab==='login'?'block':'none';
-  document.getElementById('form-register').style.display=tab==='register'?'block':'none';
-  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(tab==='login'&&i===0)||(tab==='register'&&i===1)));
-  document.getElementById('switch-text').innerHTML=tab==='login'?'Pas encore de compte ? <a onclick="switchTab( register )">S inscrire</a>':'Déjà un compte ? <a onclick="switchTab( login )">Se connecter</a>';
+function switchTab(tab) {
+  document.getElementById("form-login").style.display = tab === "login" ? "block" : "none";
+  document.getElementById("form-reg").style.display = tab === "register" ? "block" : "none";
+  document.getElementById("tab-login").className = "tab" + (tab === "login" ? " on" : "");
+  document.getElementById("tab-reg").className = "tab" + (tab === "register" ? " on" : "");
+  document.getElementById("lnk-switch").innerHTML = tab === "login"
+    ? "Pas de compte ? <a onclick=\"switchTab('register')\">S inscrire</a>"
+    : "Deja un compte ? <a onclick=\"switchTab('login')\">Se connecter</a>";
 }
 
-async function inscription(){
-  const nom=document.getElementById('reg-nom').value.trim();
-  const whatsapp=document.getElementById('reg-wa').value.trim();
-  const plaque=document.getElementById('reg-plaque').value.trim();
-  const password=document.getElementById('reg-pw').value;
-  if(!nom||!whatsapp||!plaque||!password) return toast('Remplissez tous les champs');
-  try{
-    const r=await fetch(`${API}/api/inscription`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nom,whatsapp,role:'chauffeur',password,plaque})});
-    const d=await r.json();
-    if(!r.ok) return toast(d.error||'Erreur');
-    sauvegarderSession(d.token,d.user);afficherAccueil();
-  }catch{toast('Impossible de contacter le serveur');}
+async function inscription() {
+  var nom = document.getElementById("reg-nom").value.trim();
+  var wa = document.getElementById("reg-wa").value.trim();
+  var plaque = document.getElementById("reg-plaque").value.trim();
+  var pw = document.getElementById("reg-pw").value;
+  if (!nom || !wa || !plaque || !pw) { showToast("Remplissez tous les champs"); return; }
+  try {
+    var r = await fetch(API + "/api/inscription", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({nom: nom, whatsapp: wa, role: "chauffeur", password: pw, plaque: plaque})
+    });
+    var d = await r.json();
+    if (!r.ok) { showToast(d.error || "Erreur"); return; }
+    saveSession(d.token, d.user);
+    afficherAccueil();
+  } catch(e) { showToast("Impossible de contacter le serveur"); }
 }
 
-async function connexion(){
-  const whatsapp=document.getElementById('login-wa').value.trim();
-  const password=document.getElementById('login-pw').value;
-  if(!whatsapp||!password) return toast('Remplissez tous les champs');
-  try{
-    const r=await fetch(`${API}/api/connexion`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({whatsapp,password})});
-    const d=await r.json();
-    if(!r.ok) return toast(d.error||'Erreur');
-    if(d.user.role!=='chauffeur') return toast('Ce compte est un compte client.');
-    sauvegarderSession(d.token,d.user);afficherAccueil();
-  }catch{toast('Impossible de contacter le serveur');}
+async function connexion() {
+  var wa = document.getElementById("login-wa").value.trim();
+  var pw = document.getElementById("login-pw").value;
+  if (!wa || !pw) { showToast("Remplissez tous les champs"); return; }
+  try {
+    var r = await fetch(API + "/api/connexion", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({whatsapp: wa, password: pw})
+    });
+    var d = await r.json();
+    if (!r.ok) { showToast(d.error || "Erreur"); return; }
+    if (d.user.role !== "chauffeur") { showToast("Ce compte est un compte client"); return; }
+    saveSession(d.token, d.user);
+    afficherAccueil();
+  } catch(e) { showToast("Impossible de contacter le serveur"); }
 }
 
-function sauvegarderSession(t,u){token=t;user=u;localStorage.setItem('yt_token',t);localStorage.setItem('yt_user',JSON.stringify(u));}
-
-function deconnexion(){
-  if(enLigne) changerStatut('hors_ligne');
-  localStorage.removeItem('yt_token');localStorage.removeItem('yt_user');location.reload();
+function saveSession(t, u) {
+  token = t; user = u;
+  localStorage.setItem("yt_token", t);
+  localStorage.setItem("yt_user", JSON.stringify(u));
 }
 
-function afficherAccueil(){
-  document.getElementById('screen-auth').classList.remove('active');
-  document.getElementById('screen-home').classList.add('active');
-  document.getElementById('topbar-name').textContent=user.nom;
-  document.getElementById('stat-note').textContent=user.note||'5.0';
-  initMap();initSocket();detecterPosition();
+function deconnexion() {
+  if (enLigne) changerStatut("hors_ligne");
+  localStorage.removeItem("yt_token");
+  localStorage.removeItem("yt_user");
+  location.reload();
 }
 
-function initMap(){
-  if(map) return;
-  map=L.map('map',{zoomControl:false}).setView([11.5883,43.1456],14);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+function afficherAccueil() {
+  document.getElementById("screen-auth").classList.remove("active");
+  document.getElementById("screen-histo").classList.remove("active");
+  document.getElementById("screen-home").classList.add("active");
+  document.getElementById("tnom").textContent = user.nom;
+  document.getElementById("ma-note").textContent = user.note || "5.0";
+  afficherDemandes("vide");
+  initMap();
+  initSocket();
+  detecterPos();
 }
 
-function initSocket(){
-  socket=io(API);
-  socket.on('connect',()=>socket.emit('register',{userId:user.id,role:'chauffeur'}));
-  socket.on('nouvelle_demande',data=>{clientWA=data.client.whatsapp;afficherDemande(data);afficherNotif();});
-  socket.on('course_annulée',data=>{
-    if(data.par==='client'){courseActiveId=null;clientWA=null;document.getElementById('course-active').style.display='none';toast('Le client a annulé la course.');changerStatut('libre');}
+function voirHisto() {
+  document.getElementById("screen-home").classList.remove("active");
+  document.getElementById("screen-histo").classList.add("active");
+  chargerHisto();
+}
+
+function retourAccueil() {
+  document.getElementById("screen-histo").classList.remove("active");
+  document.getElementById("screen-home").classList.add("active");
+}
+
+function voirAvis() { showToast("Avis - bientot disponible"); }
+function voirProfil() { showToast(user.nom + " - " + (user.plaque || "") + " - " + (user.note || "5.0")); }
+
+function initMap() {
+  if (map) return;
+  map = L.map("map", {zoomControl: false}).setView([11.5883, 43.1456], 14);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {attribution: "OpenStreetMap"}).addTo(map);
+}
+
+function initSocket() {
+  socket = io(API);
+  socket.on("connect", function() {
+    socket.emit("register", {userId: user.id, role: "chauffeur"});
+  });
+  socket.on("nouvelle_demande", function(data) {
+    clientWA = data.client.whatsapp;
+    afficherDemande(data);
+    afficherNotif();
+  });
+  socket.on("course_annulee", function(data) {
+    if (data.par === "client") {
+      courseActiveId = null; clientWA = null;
+      document.getElementById("course-active").style.display = "none";
+      showToast("Le client a annule la course");
+      changerStatut("libre");
+    }
   });
 }
 
-function detecterPosition(){
-  if(!navigator.geolocation) return;
-  navigator.geolocation.watchPosition(pos=>{
-    userLat=pos.coords.latitude;userLng=pos.coords.longitude;
-    if(map){
-      map.setView([userLat,userLng],15);
-      if(userMarker) userMarker.setLatLng([userLat,userLng]);
-      else userMarker=L.circleMarker([userLat,userLng],{radius:12,fillColor:'#f59e0b',color:'#000',weight:3,fillOpacity:1}).addTo(map).bindPopup('Votre position');
+function detecterPos() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.watchPosition(function(pos) {
+    userLat = pos.coords.latitude;
+    userLng = pos.coords.longitude;
+    if (map) {
+      map.setView([userLat, userLng], 15);
+      if (userMarker) userMarker.setLatLng([userLat, userLng]);
+      else userMarker = L.circleMarker([userLat, userLng], {radius:12, fillColor:"#f59e0b", color:"#000", weight:3, fillOpacity:1}).addTo(map);
     }
-    if(socket&&enLigne){
-      socket.emit('position_update',{userId:user.id,lat:userLat,lng:userLng,role:'chauffeur'});
-      fetch(`${API}/api/chauffeur/position`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({lat:userLat,lng:userLng})}).catch(()=>{});
+    if (socket && enLigne) {
+      socket.emit("position_update", {userId: user.id, lat: userLat, lng: userLng, role: "chauffeur"});
+      fetch(API + "/api/chauffeur/position", {
+        method: "POST",
+        headers: {"Content-Type":"application/json","Authorization":"Bearer " + token},
+        body: JSON.stringify({lat: userLat, lng: userLng})
+      }).catch(function(){});
     }
-  },()=>{userLat=11.5883;userLng=43.1456;},{enableHighAccuracy:true});
+  }, function() { userLat = 11.5883; userLng = 43.1456; }, {enableHighAccuracy: true});
 }
 
-async function toggleStatut(){
-  if(courseActiveId) return toast('Terminez la course en cours d abord');
-  enLigne=!enLigne;
-  const statut=enLigne?'libre':'hors_ligne';
-  const btn=document.getElementById('toggle-btn');
-  const label=document.getElementById('statut-label');
-  const sub=document.getElementById('statut-sub');
-  if(enLigne){
-    btn.className='toggle-switch toggle-on';
-    label.textContent='🟢 Disponible';
-    sub.textContent='Les clients peuvent vous voir sur la carte';
-  }else{
-    btn.className='toggle-switch toggle-off';
-    label.textContent='🔴 Hors ligne';
-    sub.textContent='Vous êtes invisible pour les clients';
-    document.getElementById('demandes-list').innerHTML=`<div class="empty-state"><div class="emoji">😴</div><p>Vous êtes hors ligne. Repassez en ligne pour recevoir des courses.</p></div>`;
+async function toggleStatut() {
+  if (courseActiveId) { showToast("Terminez la course en cours d abord"); return; }
+  enLigne = !enLigne;
+  var statut = enLigne ? "libre" : "hors_ligne";
+  var btn = document.getElementById("tog-btn");
+  var lbl = document.getElementById("tog-lbl");
+  var sub = document.getElementById("tog-sub");
+  if (enLigne) {
+    btn.className = "tog-sw ton";
+    lbl.textContent = "🟢 Disponible";
+    sub.textContent = "Les clients peuvent vous voir";
+  } else {
+    btn.className = "tog-sw toff";
+    lbl.textContent = "🔴 Hors ligne";
+    sub.textContent = "Vous etes invisible pour les clients";
+    afficherDemandes("offline");
   }
   await changerStatut(statut);
 }
 
-async function changerStatut(statut){
-  try{await fetch(`${API}/api/chauffeur/statut`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({statut})});}catch{}
+async function changerStatut(statut) {
+  try {
+    await fetch(API + "/api/chauffeur/statut", {
+      method: "POST",
+      headers: {"Content-Type":"application/json","Authorization":"Bearer " + token},
+      body: JSON.stringify({statut: statut})
+    });
+  } catch(e) {}
 }
 
-function afficherDemande(data){
-  const dist=data.client.lat&&userLat?calcDist(userLat,userLng,data.client.lat,data.client.lng):null;
-  document.getElementById('demandes-list').innerHTML=`
-    <div class="demand-card">
-      <div class="demand-header">
-        <div class="avatar">${data.client.nom.charAt(0).toUpperCase()}</div>
-        <div>
-          <p class="demand-name">${data.client.nom}</p>
-          <p class="demand-meta">📱 ${data.client.whatsapp}</p>
-          ${dist?`<p class="dist">📍 ${dist<1?Math.round(dist*1000)+'m':dist.toFixed(1)+'km'} de vous</p>`:''}
-        </div>
-      </div>
-      <div class="demand-actions">
-        <button class="btn-accept" onclick="repondre('${data.courseId}','accepter','${data.client.nom}')">✅ Accepter</button>
-        <button class="btn-refuse" onclick="repondre('${data.courseId}','refuser','')">❌ Refuser</button>
-      </div>
-    </div>`;
+function afficherDemandes(type) {
+  var div = document.getElementById("demandes");
+  if (type === "offline") {
+    div.innerHTML = "<div class=\"empty\"><div class=\"em\">😴</div><p>Vous etes hors ligne</p></div>";
+  } else {
+    div.innerHTML = "<div class=\"empty\"><div class=\"em\">⏳</div><p>En attente de demandes...</p></div>";
+  }
 }
 
-async function repondre(courseId,decision,clientNom){
-  try{
-    const r=await fetch(`${API}/api/course/repondre`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({courseId,decision})});
-    const d=await r.json();
-    if(!r.ok) return toast(d.error);
-    if(decision==='accepter'){
-      courseActiveId=courseId;
-      document.getElementById('client-en-cours').textContent=clientNom;
-      document.getElementById('course-active').style.display='block';
-      document.getElementById('demandes-list').innerHTML=`<div class="empty-state"><div class="emoji">🚗</div><p>Course en cours avec ${clientNom}.</p></div>`;
-      coursesAujourd++;document.getElementById('stat-courses').textContent=coursesAujourd;
-      toast('✅ Course acceptée ! En route vers le client.');
-    }else{
-      courseActiveId=null;enLigne=true;
-      document.getElementById('demandes-list').innerHTML=`<div class="empty-state"><div class="emoji">⏳</div><p>En attente de nouvelles demandes...</p></div>`;
-      toast('Course refusée.');await changerStatut('libre');
+function afficherDemande(data) {
+  var dist = "";
+  if (data.client.lat && userLat) {
+    var d = calcDist(userLat, userLng, data.client.lat, data.client.lng);
+    dist = d < 1 ? Math.round(d*1000) + "m" : d.toFixed(1) + "km";
+  }
+  var div = document.getElementById("demandes");
+  div.innerHTML = "<div class=\"dcard\">"
+    + "<div class=\"dhead\">"
+    + "<div class=\"av\">" + data.client.nom.charAt(0).toUpperCase() + "</div>"
+    + "<div><p class=\"dnom\">" + data.client.nom + "</p>"
+    + "<p class=\"dmeta\">📱 " + data.client.whatsapp + "</p>"
+    + (dist ? "<p class=\"ddist\">📍 " + dist + " de vous</p>" : "")
+    + "</div></div>"
+    + "<div class=\"dact\">"
+    + "<button class=\"bacc\" onclick=\"repondre('" + data.courseId + "','accepter','" + data.client.nom + "')\">✅ Accepter</button>"
+    + "<button class=\"bref\" onclick=\"repondre('" + data.courseId + "','refuser','')\">❌ Refuser</button>"
+    + "</div></div>";
+}
+
+async function repondre(courseId, decision, clientNom) {
+  try {
+    var r = await fetch(API + "/api/course/repondre", {
+      method: "POST",
+      headers: {"Content-Type":"application/json","Authorization":"Bearer " + token},
+      body: JSON.stringify({courseId: courseId, decision: decision})
+    });
+    var d = await r.json();
+    if (!r.ok) { showToast(d.error); return; }
+    if (decision === "accepter") {
+      courseActiveId = courseId;
+      document.getElementById("client-nom").textContent = clientNom;
+      document.getElementById("course-active").style.display = "block";
+      document.getElementById("demandes").innerHTML = "<div class=\"empty\"><div class=\"em\">🚗</div><p>Course en cours avec " + clientNom + "</p></div>";
+      nbCourses++;
+      document.getElementById("nb-courses").textContent = nbCourses;
+      showToast("Course acceptee ! En route vers le client");
+    } else {
+      courseActiveId = null; enLigne = true;
+      afficherDemandes("vide");
+      showToast("Course refusee");
+      await changerStatut("libre");
     }
-  }catch{toast('Erreur de connexion');}
+  } catch(e) { showToast("Erreur de connexion"); }
 }
 
-async function terminerCourse(){
-  if(!courseActiveId) return;
-  try{
-    const r=await fetch(`${API}/api/course/terminer`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({courseId:courseActiveId})});
-    if(!r.ok) return toast('Erreur');
-    courseActiveId=null;clientWA=null;
-    document.getElementById('course-active').style.display='none';
-    document.getElementById('demandes-list').innerHTML=`<div class="empty-state"><div class="emoji">⏳</div><p>En attente de nouvelles demandes...</p></div>`;
-    toast('🏁 Course terminée ! Bien joué.');enLigne=true;await changerStatut('libre');
-  }catch{toast('Erreur');}
+async function terminerCourse() {
+  if (!courseActiveId) return;
+  try {
+    var r = await fetch(API + "/api/course/terminer", {
+      method: "POST",
+      headers: {"Content-Type":"application/json","Authorization":"Bearer " + token},
+      body: JSON.stringify({courseId: courseActiveId})
+    });
+    if (!r.ok) { showToast("Erreur"); return; }
+    courseActiveId = null; clientWA = null;
+    document.getElementById("course-active").style.display = "none";
+    afficherDemandes("vide");
+    showToast("Course terminee ! Bien joue");
+    enLigne = true;
+    await changerStatut("libre");
+  } catch(e) { showToast("Erreur"); }
 }
 
-function afficherNotif(){
-  const b=document.getElementById('notif-banner');b.style.display='block';
-  setTimeout(()=>b.style.display='none',5000);
-  try{const a=new AudioContext();const o=a.createOscillator();o.connect(a.destination);o.start();o.stop(a.currentTime+0.2);}catch{}
+function afficherNotif() {
+  var b = document.getElementById("notif");
+  b.style.display = "block";
+  setTimeout(function() { b.style.display = "none"; }, 5000);
 }
 
-function ouvrirWhatsapp(){
-  if(!clientWA) return toast('Numéro non disponible');
-  const num=clientWA.replace(/\D/g,'');
-  window.open(`https://wa.me/${num}?text=Bonjour, je suis votre chauffeur YalaTaxi, j'arrive !`,'_blank');
+function ouvrirWA() {
+  if (!clientWA) { showToast("Numero non disponible"); return; }
+  var num = clientWA.replace(/\D/g, "");
+  window.open("https://wa.me/" + num + "?text=Bonjour je suis votre chauffeur YalaTaxi", "_blank");
 }
 
-function calcDist(lat1,lng1,lat2,lng2){
-  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
-  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+function calcDist(lat1, lng1, lat2, lng2) {
+  var R = 6371;
+  var dLat = (lat2-lat1)*Math.PI/180;
+  var dLng = (lng2-lng1)*Math.PI/180;
+  var a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-function voirHistorique(){
-  document.getElementById('screen-home').classList.remove('active');
-  document.getElementById('screen-historique').classList.add('active');
-  chargerHistorique();
-}
-function retourAccueil(){
-  document.getElementById('screen-historique').classList.remove('active');
-  document.getElementById('screen-home').classList.add('active');
-}
-async function chargerHistorique(){
-  const div=document.getElementById('histo-content');
-  div.innerHTML='<div class="histo-empty"><div class="emoji">⏳</div><p>Chargement...</p></div>';
-  try{
-    const r=await fetch(`${API}/api/mes-courses`,{headers:{'Authorization':`Bearer ${token}`}});
-    const courses=await r.json();
-    if(!courses.length){
-      div.innerHTML='<div class="histo-empty"><div class="emoji">🚗</div><p>Vous n'avez pas encore de courses.<br>Passez en ligne pour commencer !</p></div>';
+async function chargerHisto() {
+  var div = document.getElementById("histo-list");
+  div.innerHTML = "<div class=\"empty\"><div class=\"em\">⏳</div><p>Chargement...</p></div>";
+  try {
+    var r = await fetch(API + "/api/mes-courses", {headers: {"Authorization": "Bearer " + token}});
+    var courses = await r.json();
+    if (!courses.length) {
+      div.innerHTML = "<div class=\"empty\"><div class=\"em\">🚗</div><p>Aucune course pour le moment</p></div>";
       return;
     }
-    const emojis={terminée:'✅',annulée:'❌',en_attente:'⏳',acceptée:'🚗',refusée:'⛔'};
-    const labels={terminée:'Terminée',annulée:'Annulée',en_attente:'En attente',acceptée:'Acceptée',refusée:'Refusée'};
-    div.innerHTML=courses.map(c=>{
-      const date=new Date(c.createdAt).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-      const emoji=emojis[c.statut]||'🚗';
-      const label=labels[c.statut]||c.statut;
-      const color=c.statut==='terminée'?'var(--vert)':c.statut==='annulée'?'var(--rouge)':'var(--jaune)';
-      return `<div class="course-item">
-        <div class="course-item-header">
-          <p class="course-item-nom">👤 ${c.clientNom||'Client'}</p>
-          <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.05);color:${color}">${emoji} ${label}</span>
-        </div>
-        <p class="course-item-date">📅 ${date}</p>
-      </div>`;
-    }).join('');
-  }catch{div.innerHTML='<div class="histo-empty"><div class="emoji">❌</div><p>Erreur de chargement.</p></div>';}
+    var html = "";
+    for (var i = 0; i < courses.length; i++) {
+      var c = courses[i];
+      var date = new Date(c.createdAt).toLocaleDateString("fr-FR", {day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
+      var emoji = {terminee:"✅",annulee:"❌",en_attente:"⏳",acceptee:"🚗",refusee:"⛔"}[c.statut] || "🚗";
+      var color = c.statut === "terminee" ? "var(--v)" : c.statut === "annulee" ? "var(--r)" : "var(--j)";
+      html += "<div class=\"ci\"><div class=\"cih\"><p class=\"cin\">👤 " + (c.clientNom || "Client") + "</p>"
+        + "<span style=\"font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.05);color:" + color + "\">" + emoji + " " + c.statut + "</span></div>"
+        + "<p class=\"cid\">📅 " + date + "</p></div>";
+    }
+    div.innerHTML = html;
+  } catch(e) {
+    div.innerHTML = "<div class=\"empty\"><div class=\"em\">❌</div><p>Erreur de chargement</p></div>";
+  }
 }
-function voirProfil(){toast(`${user.nom} · ${user.plaque||''} · ⭐ ${user.note||'5.0'}`);}
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+
+function showToast(msg) {
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(function() { t.classList.remove("show"); }, 3500);
+}
 </script>
 </body>
 </html>
