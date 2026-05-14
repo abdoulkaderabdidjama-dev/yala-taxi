@@ -13,6 +13,8 @@
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--n);color:var(--t);min-height:100vh}
 .screen{display:none;min-height:100vh;flex-direction:column}
 .screen.active{display:flex}
+
+/* AUTH */
 #screen-auth{background:var(--n);align-items:center;justify-content:center;padding:32px 24px;gap:20px}
 .logo{font-size:56px;animation:bounce 2s infinite}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -33,57 +35,77 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .br{background:rgba(239,68,68,0.15);color:var(--r);border:1px solid rgba(239,68,68,0.3)}
 .lnk{font-size:12px;color:var(--m);text-align:center}
 .lnk a{color:var(--j);font-weight:700;cursor:pointer;text-decoration:none}
-.forgot{font-size:12px;color:var(--j);text-align:center;font-weight:700;cursor:pointer}
+.forgot{font-size:12px;color:var(--j);text-align:center;font-weight:700;cursor:pointer;margin-top:2px}
+
+/* HOME */
 #screen-home{background:var(--n)}
 .topbar{background:var(--n2);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--b)}
 .topbar-g{font-size:11px;color:var(--m)}
 .topbar-n{font-size:17px;font-weight:800;color:var(--j)}
 .ibtn{width:36px;height:36px;border-radius:50%;background:var(--n3);border:1px solid var(--b);color:var(--t);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-#map{height:260px;width:100%;z-index:1}
+
+/* MAP */
+#map{height:260px;width:100%;z-index:1;position:relative}
+.map-btns{position:absolute;top:10px;right:10px;z-index:400;display:flex;flex-direction:column;gap:6px}
+.mbtn{width:34px;height:34px;background:var(--n2);border:1px solid var(--b);border-radius:8px;color:var(--j);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:800}
+.map-info{position:absolute;bottom:10px;left:10px;z-index:400;background:rgba(10,10,10,0.85);border:1px solid var(--b);border-radius:8px;padding:5px 10px;font-size:11px;color:var(--j);font-weight:600}
+
+/* CONTENT */
 .cnt{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
 .sec{font-size:11px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.8px}
 .poscard{background:var(--n2);border:1px solid var(--b);border-radius:var(--rad);padding:13px 15px;display:flex;align-items:center;gap:12px}
 .posico{width:38px;height:38px;border-radius:50%;background:var(--jl);border:1px solid rgba(245,158,11,0.3);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .poslbl{font-size:10px;color:var(--m)}
 .posval{font-size:13px;font-weight:600;color:var(--t)}
+
+/* COURSE ACTIVE */
 .cban{background:var(--n2);border:1px solid rgba(74,222,128,0.3);border-radius:var(--rad);padding:14px;display:flex;flex-direction:column;gap:10px}
 .cbh{display:flex;justify-content:space-between;align-items:center}
 .cbt{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--v)}
 .cbd{font-size:16px;font-weight:800;color:var(--j)}
-.pb{height:3px;background:var(--n3);border-radius:2px;overflow:hidden}
+.pbar{height:3px;background:var(--n3);border-radius:2px;overflow:hidden}
 .pf{height:100%;background:var(--j);border-radius:2px;animation:pa 3s ease-in-out infinite alternate}
 @keyframes pa{0%{width:20%}100%{width:85%}}
 .cbi{font-size:12px;color:var(--m)}
+
+/* CHAUFFEURS */
 .dcard{background:var(--n2);border:1px solid var(--b);border-radius:var(--rad);padding:13px 15px;display:flex;align-items:center;gap:11px;transition:border-color 0.2s}
 .dcard:hover{border-color:rgba(245,158,11,0.3)}
-.av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;flex-shrink:0;background:var(--jl);color:var(--j);border:1px solid rgba(245,158,11,0.3)}
+.av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;flex-shrink:0;background:var(--jl);color:var(--j);border:1px solid rgba(245,158,11,0.3)}
 .dinfo{flex:1;min-width:0}
 .dnom{font-size:14px;font-weight:700;color:var(--t)}
 .dmeta{display:flex;gap:7px;align-items:center;margin-top:3px;flex-wrap:wrap}
 .pill{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
 .pfree{background:rgba(74,222,128,0.12);color:var(--v)}
-.pbusy{background:rgba(239,68,68,0.12);color:var(--r)}
 .dist{font-size:11px;color:var(--j);font-weight:600}
 .dact{display:flex;flex-direction:column;gap:5px}
 .bsm{padding:7px 12px;border:none;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
 .bsm:active{transform:scale(0.96)}
 .bwa{background:rgba(37,211,102,0.1);color:#25d366;border:1px solid rgba(37,211,102,0.2)}
-.bdem{background:var(--j);color:#000}
-.bdem:disabled{background:var(--n3);color:#444;cursor:not-allowed}
-.bsearch{width:100%;padding:16px;border:none;border-radius:var(--rad);font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;background:var(--j);color:#000}
+.bdem{background:var(--j);color:#000;border:none}
+.bdem:disabled{background:var(--n3);color:#444;cursor:not-allowed;border:none}
+.bsearch{width:100%;padding:16px;border:none;border-radius:var(--rad);font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;background:var(--j);color:#000;transition:all 0.15s}
 .bsearch:active{transform:scale(0.98)}
 .bsearch:disabled{background:var(--n3);color:#444;cursor:not-allowed}
+
+/* EMPTY */
 .empty{background:var(--n2);border:1px solid var(--b);border-radius:var(--rad);padding:22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
 .empty .em{font-size:34px}
 .empty p{font-size:13px;color:var(--m)}
+
+/* TOAST & LOADER */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--n2);color:var(--t);border:1px solid var(--b);padding:11px 18px;border-radius:11px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;max-width:90vw;text-align:center;white-space:nowrap}
 .toast.show{opacity:1}
 .loader{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,0,0,0.3);border-top-color:#000;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:7px}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* NAV */
 .bnav{display:flex;background:var(--n2);border-top:1px solid var(--b);position:sticky;bottom:0;z-index:100}
-.ni{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:inherit;font-size:9px;font-weight:600;color:#444}
+.ni{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:inherit;font-size:9px;font-weight:600;color:#444;transition:color 0.2s}
 .ni.on{color:var(--j)}
 .nico{font-size:21px}
+
+/* MODAL */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;z-index:200;opacity:0;transition:opacity 0.3s;pointer-events:none}
 .ov.open{opacity:1;pointer-events:all}
 .modal{background:var(--n2);border:1px solid var(--b);border-radius:22px 22px 0 0;padding:22px;width:100%;display:flex;flex-direction:column;gap:14px;transform:translateY(100%);transition:transform 0.3s}
@@ -91,19 +113,42 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .mh{width:36px;height:3px;background:var(--b);border-radius:2px;margin:0 auto}
 .mt{font-size:17px;font-weight:800;color:var(--j)}
 .ms{font-size:13px;color:var(--m);line-height:1.6}
+
+/* HEADER SECONDAIRE */
 .htop{background:var(--n2);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--b);position:sticky;top:0;z-index:10}
 .hbk{width:34px;height:34px;border-radius:50%;background:var(--n3);border:1px solid var(--b);color:var(--j);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
 .htit{font-size:17px;font-weight:800;color:var(--j)}
 .hcnt{flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+
+/* HISTORIQUE */
 .ci{background:var(--n2);border:1px solid var(--b);border-radius:var(--rad);padding:14px;display:flex;flex-direction:column;gap:6px}
 .cih{display:flex;align-items:center;justify-content:space-between}
 .cin{font-size:14px;font-weight:700;color:var(--t)}
 .cid{font-size:11px;color:var(--m)}
 .cdet{font-size:12px;color:var(--m);display:flex;gap:10px}
+
+/* PROFIL */
+.profil-hero{background:var(--n2);border-bottom:1px solid var(--b);padding:24px 18px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.profil-av{width:72px;height:72px;border-radius:50%;background:rgba(245,158,11,0.15);border:2px solid var(--j);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--j)}
+.profil-nom{font-size:20px;font-weight:800;color:var(--t)}
+.profil-role{font-size:12px;color:var(--m);margin-top:-4px}
+.profil-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--b);border:1px solid var(--b);border-radius:14px;overflow:hidden;margin:0 14px}
+.pstat{background:var(--n2);padding:14px 8px;text-align:center}
+.pstat-v{font-size:20px;font-weight:800;color:var(--j)}
+.pstat-l{font-size:10px;color:var(--m);margin-top:2px}
+.prow{background:var(--n2);border:1px solid var(--b);border-radius:var(--rad);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.prow-l{display:flex;align-items:center;gap:12px}
+.prow-ico{font-size:18px;width:32px;text-align:center}
+.prow-t{font-size:14px;font-weight:600;color:var(--t)}
+.prow-s{font-size:11px;color:var(--m);margin-top:2px}
+.prow-v{font-size:13px;color:var(--j);font-weight:700}
+.psec{font-size:11px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.8px;padding:0 2px}
+.pbtn-deco{width:100%;padding:14px;background:rgba(239,68,68,0.1);color:var(--r);border:1px solid rgba(239,68,68,0.3);border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body>
 
+<!-- ECRAN AUTH -->
 <div class="screen active" id="screen-auth">
   <div class="logo">🚖</div>
   <div class="titre">YalaTaxi</div>
@@ -112,7 +157,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   <div class="card">
     <div class="tabs">
       <button class="tab on" id="tab-login" onclick="switchTab('login')">Se connecter</button>
-      <button class="tab" id="tab-reg" onclick="switchTab('register')">S inscrire</button>
+      <button class="tab" id="tab-reg" onclick="switchTab('register')">S'inscrire</button>
     </div>
     <div id="form-login">
       <div style="display:flex;flex-direction:column;gap:10px">
@@ -130,20 +175,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
         <button class="btn bj" onclick="inscription()">Creer mon compte</button>
       </div>
     </div>
-    <p class="lnk" id="lnk-switch">Pas de compte ? <a onclick="switchTab('register')">S inscrire</a></p>
+    <p class="lnk" id="lnk-switch">Pas de compte ? <a onclick="switchTab('register')">S'inscrire</a></p>
     <p class="lnk">Vous etes chauffeur ? <a href="chauffeur.html">Espace chauffeur</a></p>
   </div>
 </div>
 
+<!-- ECRAN ACCUEIL -->
 <div class="screen" id="screen-home">
   <div class="topbar">
     <div>
       <p class="topbar-g">Bonjour 👋</p>
       <p class="topbar-n" id="tnom">Ahmed</p>
     </div>
-    <button class="ibtn" onclick="deconnexion()">🚪</button>
+    <button class="ibtn" onclick="deconnexion()" title="Deconnexion">🚪</button>
   </div>
-  <div id="map"></div>
+  <div style="position:relative">
+    <div id="map"></div>
+    <div class="map-btns">
+      <button class="mbtn" onclick="centrerCarte()" title="Ma position">📍</button>
+      <button class="mbtn" onclick="map && map.zoomIn()">+</button>
+      <button class="mbtn" onclick="map && map.zoomOut()">−</button>
+    </div>
+    <div class="map-info" id="map-info">📡 Localisation...</div>
+  </div>
   <div class="cnt">
     <div class="poscard">
       <div class="posico">📍</div>
@@ -158,7 +212,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
         <button onclick="showAnnuler()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:var(--r);border-radius:7px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:700;">Annuler</button>
       </div>
       <p class="cbd" id="chauff-nom">—</p>
-      <div class="pb"><div class="pf"></div></div>
+      <div class="pbar"><div class="pf"></div></div>
       <div style="display:flex;justify-content:space-between;align-items:center">
         <p class="cbi" id="course-info">Le chauffeur arrive...</p>
         <button onclick="ouvrirWA()" style="background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.2);color:#25d366;border-radius:8px;padding:6px 11px;font-size:12px;cursor:pointer;font-weight:700;">📞 WhatsApp</button>
@@ -166,27 +220,82 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
     </div>
     <p class="sec">Taxis disponibles pres de vous</p>
     <div id="drivers-list">
-      <div class="empty"><div class="em">🔍</div><p>Appuyez sur Chercher un taxi pour voir les chauffeurs</p></div>
+      <div class="empty"><div class="em">🔍</div><p>Appuyez sur Chercher un taxi pour voir les chauffeurs disponibles</p></div>
     </div>
     <button class="bsearch" id="btn-search" onclick="rechercherTaxis()">🚕 Chercher un taxi</button>
   </div>
   <div class="bnav">
-    <button class="ni on" id="nav-home" onclick="retourAccueil()"><span class="nico">🏠</span>Accueil</button>
-    <button class="ni" id="nav-courses" onclick="voirHisto()"><span class="nico">📋</span>Courses</button>
-    <button class="ni" id="nav-profil" onclick="voirProfil()"><span class="nico">👤</span>Profil</button>
+    <button class="ni on" id="nav-home" onclick="allerAccueil()"><span class="nico">🏠</span>Accueil</button>
+    <button class="ni" id="nav-courses" onclick="allerHisto()"><span class="nico">📋</span>Courses</button>
+    <button class="ni" id="nav-profil" onclick="allerProfil()"><span class="nico">👤</span>Profil</button>
   </div>
 </div>
 
+<!-- ECRAN HISTORIQUE -->
 <div class="screen" id="screen-histo">
   <div class="htop">
-    <button class="hbk" onclick="retourAccueil()">←</button>
+    <button class="hbk" onclick="allerAccueil()">←</button>
     <p class="htit">📋 Mes Courses</p>
   </div>
   <div class="hcnt" id="histo-list">
     <div class="empty"><div class="em">⏳</div><p>Chargement...</p></div>
   </div>
+  <div class="bnav">
+    <button class="ni" onclick="allerAccueil()"><span class="nico">🏠</span>Accueil</button>
+    <button class="ni on"><span class="nico">📋</span>Courses</button>
+    <button class="ni" onclick="allerProfil()"><span class="nico">👤</span>Profil</button>
+  </div>
 </div>
 
+<!-- ECRAN PROFIL -->
+<div class="screen" id="screen-profil">
+  <div class="htop">
+    <button class="hbk" onclick="allerAccueil()">←</button>
+    <p class="htit">👤 Mon Profil</p>
+  </div>
+  <div class="hcnt">
+    <div class="profil-hero">
+      <div class="profil-av" id="profil-initiale">A</div>
+      <p class="profil-nom" id="profil-nom">Ahmed</p>
+      <p class="profil-role">🚖 Client YalaTaxi</p>
+    </div>
+    <div class="profil-stats">
+      <div class="pstat"><p class="pstat-v" id="profil-courses">0</p><p class="pstat-l">Courses</p></div>
+      <div class="pstat"><p class="pstat-v" id="profil-membre">—</p><p class="pstat-l">Membre depuis</p></div>
+    </div>
+    <p class="psec">Informations</p>
+    <div class="prow" style="cursor:default">
+      <div class="prow-l">
+        <span class="prow-ico">📱</span>
+        <div><p class="prow-t">WhatsApp</p><p class="prow-s">Numero de contact</p></div>
+      </div>
+      <span class="prow-v" id="profil-wa">—</span>
+    </div>
+    <div class="prow" onclick="partagerAppli()">
+      <div class="prow-l">
+        <span class="prow-ico">🔗</span>
+        <div><p class="prow-t">Partager YalaTaxi</p><p class="prow-s">Inviter un ami ou chauffeur</p></div>
+      </div>
+      <span class="prow-v">→</span>
+    </div>
+    <p class="psec">Compte</p>
+    <div class="prow" onclick="window.location.href='reset.html'">
+      <div class="prow-l">
+        <span class="prow-ico">🔑</span>
+        <div><p class="prow-t">Changer mon mot de passe</p><p class="prow-s">Modifier via reset.html</p></div>
+      </div>
+      <span class="prow-v">→</span>
+    </div>
+    <button class="pbtn-deco" onclick="deconnexion()">🚪 Se deconnecter</button>
+  </div>
+  <div class="bnav">
+    <button class="ni" onclick="allerAccueil()"><span class="nico">🏠</span>Accueil</button>
+    <button class="ni" onclick="allerHisto()"><span class="nico">📋</span>Courses</button>
+    <button class="ni on"><span class="nico">👤</span>Profil</button>
+  </div>
+</div>
+
+<!-- MODAL ANNULER -->
 <div class="ov" id="modal-annuler">
   <div class="modal">
     <div class="mh"></div>
@@ -205,18 +314,21 @@ var token = localStorage.getItem("yt_token");
 var user = JSON.parse(localStorage.getItem("yt_user") || "null");
 var socket = null, map = null, userMarker = null, driverMarkers = {};
 var userLat = null, userLng = null, courseActive = null, chauffeurWA = null;
+var nbCourses = 0;
 
+// ─── INIT ───────────────────────────────────────────────
 window.onload = function() {
-  if (token && user) afficherAccueil();
+  if (token && user && user.role === "client") allerAccueil();
 };
 
+// ─── AUTH ────────────────────────────────────────────────
 function switchTab(tab) {
   document.getElementById("form-login").style.display = tab === "login" ? "block" : "none";
   document.getElementById("form-reg").style.display = tab === "register" ? "block" : "none";
   document.getElementById("tab-login").className = "tab" + (tab === "login" ? " on" : "");
   document.getElementById("tab-reg").className = "tab" + (tab === "register" ? " on" : "");
   document.getElementById("lnk-switch").innerHTML = tab === "login"
-    ? "Pas de compte ? <a onclick=\"switchTab('register')\">S inscrire</a>"
+    ? "Pas de compte ? <a onclick=\"switchTab('register')\">S'inscrire</a>"
     : "Deja un compte ? <a onclick=\"switchTab('login')\">Se connecter</a>";
 }
 
@@ -227,14 +339,13 @@ async function inscription() {
   if (!nom || !wa || !pw) { showToast("Remplissez tous les champs"); return; }
   try {
     var r = await fetch(API + "/api/inscription", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({nom: nom, whatsapp: wa, role: "client", password: pw})
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({nom:nom, whatsapp:wa, role:"client", password:pw})
     });
     var d = await r.json();
     if (!r.ok) { showToast(d.error || "Erreur"); return; }
     saveSession(d.token, d.user);
-    afficherAccueil();
+    allerAccueil();
   } catch(e) { showToast("Impossible de contacter le serveur"); }
 }
 
@@ -244,15 +355,14 @@ async function connexion() {
   if (!wa || !pw) { showToast("Remplissez tous les champs"); return; }
   try {
     var r = await fetch(API + "/api/connexion", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({whatsapp: wa, password: pw})
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({whatsapp:wa, password:pw})
     });
     var d = await r.json();
     if (!r.ok) { showToast(d.error || "Erreur"); return; }
     if (d.user.role !== "client") { showToast("Ce compte est un compte chauffeur"); return; }
     saveSession(d.token, d.user);
-    afficherAccueil();
+    allerAccueil();
   } catch(e) { showToast("Impossible de contacter le serveur"); }
 }
 
@@ -268,41 +378,124 @@ function deconnexion() {
   location.reload();
 }
 
-function afficherAccueil() {
-  document.getElementById("screen-auth").classList.remove("active");
-  document.getElementById("screen-histo").classList.remove("active");
-  document.getElementById("screen-home").classList.add("active");
-  document.getElementById("tnom").textContent = user.nom;
-  initMap();
-  initSocket();
-  detecterPos();
+// ─── NAVIGATION ──────────────────────────────────────────
+function cacherTous() {
+  ["screen-auth","screen-home","screen-histo","screen-profil"].forEach(function(id) {
+    document.getElementById(id).classList.remove("active");
+  });
 }
 
-function voirHisto() {
-  document.getElementById("screen-home").classList.remove("active");
+function allerAccueil() {
+  cacherTous();
+  document.getElementById("screen-home").classList.add("active");
+  document.getElementById("tnom").textContent = user ? user.nom : "";
+  if (!map) { initMap(); detecterPos(); }
+  if (!socket) initSocket();
+}
+
+function allerHisto() {
+  cacherTous();
   document.getElementById("screen-histo").classList.add("active");
   chargerHisto();
 }
 
-function retourAccueil() {
-  document.getElementById("screen-histo").classList.remove("active");
-  document.getElementById("screen-home").classList.add("active");
+function allerProfil() {
+  cacherTous();
+  document.getElementById("screen-profil").classList.add("active");
+  remplirProfil();
 }
 
-function voirProfil() {
-  showToast("Profil de " + user.nom + " - bientot disponible");
+function remplirProfil() {
+  if (!user) return;
+  var initiale = (user.nom || "?").charAt(0).toUpperCase();
+  document.getElementById("profil-initiale").textContent = initiale;
+  document.getElementById("profil-nom").textContent = user.nom || "—";
+  document.getElementById("profil-wa").textContent = user.whatsapp || "—";
+  document.getElementById("profil-courses").textContent = nbCourses;
+  // Date membre
+  var now = new Date();
+  var mois = ["Jan","Fev","Mar","Avr","Mai","Juin","Juil","Aout","Sep","Oct","Nov","Dec"];
+  document.getElementById("profil-membre").textContent = mois[now.getMonth()] + " " + now.getFullYear();
 }
 
+function partagerAppli() {
+  var lien = "https://yala-taxi.onrender.com";
+  if (navigator.share) {
+    navigator.share({title:"YalaTaxi", text:"Trouvez un taxi a Djibouti !", url:lien});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(lien).then(function() { showToast("Lien copie ! Partagez-le sur WhatsApp"); });
+  } else {
+    showToast("Lien: " + lien);
+  }
+}
+
+// ─── CARTE ───────────────────────────────────────────────
 function initMap() {
   if (map) return;
-  map = L.map("map", {zoomControl: false}).setView([11.5883, 43.1456], 14);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {attribution: "OpenStreetMap"}).addTo(map);
+  map = L.map("map", {zoomControl:false, attributionControl:false}).setView([11.5883, 43.1456], 14);
+
+  // Tuiles sombres modernes
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+    maxZoom: 19,
+    subdomains: "abcd"
+  }).addTo(map);
+
+  map.on("click", function(e) {
+    showToast("📍 " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4));
+  });
 }
 
+function detecterPos() {
+  if (!navigator.geolocation) {
+    document.getElementById("pos-txt").textContent = "GPS non supporte";
+    document.getElementById("map-info").textContent = "⚠️ GPS indisponible";
+    userLat = 11.5883; userLng = 43.1456;
+    return;
+  }
+  navigator.geolocation.watchPosition(function(pos) {
+    userLat = pos.coords.latitude;
+    userLng = pos.coords.longitude;
+    var acc = Math.round(pos.coords.accuracy);
+    document.getElementById("pos-txt").textContent = userLat.toFixed(4) + ", " + userLng.toFixed(4);
+    document.getElementById("map-info").textContent = "📍 Precision " + acc + "m";
+
+    if (map) {
+      if (!userMarker) {
+        var icon = L.divIcon({
+          className: "",
+          html: "<div style=\"width:38px;height:38px;border-radius:50%;background:#f59e0b;border:3px solid #000;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 0 0 4px rgba(245,158,11,0.3)\">🧑</div>",
+          iconSize: [38, 38],
+          iconAnchor: [19, 19]
+        });
+        userMarker = L.marker([userLat, userLng], {icon:icon}).addTo(map);
+        userMarker.bindPopup("<b style='color:#f59e0b'>" + (user ? user.nom : "Vous") + "</b><br>Votre position");
+        map.setView([userLat, userLng], 15);
+      } else {
+        userMarker.setLatLng([userLat, userLng]);
+      }
+    }
+    if (socket) socket.emit("position_update", {userId:user.id, lat:userLat, lng:userLng, role:"client"});
+  }, function() {
+    document.getElementById("pos-txt").textContent = "Djibouti-Ville (GPS refuse)";
+    document.getElementById("map-info").textContent = "⚠️ GPS non disponible";
+    userLat = 11.5883; userLng = 43.1456;
+  }, {enableHighAccuracy:true, maximumAge:5000});
+}
+
+function centrerCarte() {
+  if (map && userLat) {
+    map.setView([userLat, userLng], 16);
+    if (userMarker) userMarker.openPopup();
+  } else {
+    showToast("Position non disponible");
+  }
+}
+
+// ─── SOCKET ──────────────────────────────────────────────
 function initSocket() {
   socket = io(API);
   socket.on("connect", function() {
-    socket.emit("register", {userId: user.id, role: "client"});
+    if (user) socket.emit("register", {userId:user.id, role:"client"});
   });
   socket.on("drivers_updated", function(drivers) {
     majMarqueurs(drivers);
@@ -310,11 +503,12 @@ function initSocket() {
   socket.on("course_acceptee", function(data) {
     courseActive = data.courseId;
     chauffeurWA = data.chauffeur.whatsapp;
-    document.getElementById("chauff-nom").textContent = data.chauffeur.nom + " - " + data.chauffeur.plaque;
+    document.getElementById("chauff-nom").textContent = data.chauffeur.nom + " — " + (data.chauffeur.plaque || "");
     document.getElementById("course-info").textContent = "Chauffeur en route vers vous !";
     document.getElementById("course-ban").style.display = "flex";
     document.getElementById("btn-search").disabled = true;
-    showToast("Le chauffeur a accepte votre course !");
+    nbCourses++;
+    showToast("✅ Le chauffeur a accepte votre course !");
   });
   socket.on("course_refusee", function() {
     courseActive = null;
@@ -332,31 +526,11 @@ function initSocket() {
     courseActive = null;
     document.getElementById("course-ban").style.display = "none";
     document.getElementById("btn-search").disabled = false;
-    showToast("Course terminee ! Merci d utiliser YalaTaxi");
+    showToast("🎉 Course terminee ! Merci d'utiliser YalaTaxi");
   });
 }
 
-function detecterPos() {
-  if (!navigator.geolocation) {
-    document.getElementById("pos-txt").textContent = "GPS non supporte";
-    return;
-  }
-  navigator.geolocation.watchPosition(function(pos) {
-    userLat = pos.coords.latitude;
-    userLng = pos.coords.longitude;
-    document.getElementById("pos-txt").textContent = userLat.toFixed(4) + ", " + userLng.toFixed(4);
-    if (map) {
-      map.setView([userLat, userLng], 15);
-      if (userMarker) userMarker.setLatLng([userLat, userLng]);
-      else userMarker = L.circleMarker([userLat, userLng], {radius:10, fillColor:"#f59e0b", color:"#000", weight:3, fillOpacity:1}).addTo(map).bindPopup("Vous etes ici");
-    }
-    if (socket) socket.emit("position_update", {userId: user.id, lat: userLat, lng: userLng, role: "client"});
-  }, function() {
-    document.getElementById("pos-txt").textContent = "Djibouti-Ville (GPS refuse)";
-    userLat = 11.5883; userLng = 43.1456;
-  }, {enableHighAccuracy: true});
-}
-
+// ─── RECHERCHE ───────────────────────────────────────────
 async function rechercherTaxis() {
   var btn = document.getElementById("btn-search");
   btn.innerHTML = "<span class=\"loader\"></span>Recherche...";
@@ -364,7 +538,7 @@ async function rechercherTaxis() {
   try {
     var params = userLat ? "?lat=" + userLat + "&lng=" + userLng : "";
     var r = await fetch(API + "/api/chauffeurs" + params, {
-      headers: {"Authorization": "Bearer " + token}
+      headers: {"Authorization":"Bearer " + token}
     });
     var drivers = await r.json();
     afficherChauffeurs(drivers);
@@ -390,12 +564,12 @@ function afficherChauffeurs(drivers) {
       + "<p class=\"dnom\">" + d.nom + "</p>"
       + "<div class=\"dmeta\"><span class=\"pill pfree\">Libre</span>"
       + "<span style=\"font-size:11px;color:var(--j)\">⭐ " + (d.note || "5.0") + "</span>"
-      + (distTxt ? "<span class=\"dist\">" + distTxt + "</span>" : "")
+      + (distTxt ? "<span class=\"dist\">📍 " + distTxt + "</span>" : "")
       + "</div>"
-      + "<p style=\"font-size:11px;color:var(--m);margin-top:2px\">📱 " + d.whatsapp + "</p>"
+      + "<p style=\"font-size:11px;color:var(--m);margin-top:2px\">🚘 " + (d.plaque || "—") + " &nbsp;·&nbsp; 📱 " + d.whatsapp + "</p>"
       + "</div>"
       + "<div class=\"dact\">"
-      + "<button class=\"bsm bdem\" onclick=\"demanderCourse('" + d.id + "','" + d.nom + "')\" " + (courseActive ? "disabled" : "") + ">Demander</button>"
+      + "<button class=\"bsm bdem\" onclick=\"demanderCourse('" + d.id + "','" + d.nom + "','" + d.whatsapp + "')\" " + (courseActive ? "disabled" : "") + ">Demander</button>"
       + "<button class=\"bsm bwa\" onclick=\"ouvrirWADirect('" + d.whatsapp + "')\">WhatsApp</button>"
       + "</div></div>";
   }
@@ -404,36 +578,47 @@ function afficherChauffeurs(drivers) {
 
 function majMarqueurs(drivers) {
   if (!map) return;
-  var taxiIcon = L.divIcon({html: "🚕", className: "", iconSize: [24, 24]});
   for (var id in driverMarkers) {
-    var found = false;
-    for (var i = 0; i < drivers.length; i++) { if (drivers[i].id === id) { found = true; break; } }
+    var found = drivers.some(function(d) { return d.id === id; });
     if (!found) { map.removeLayer(driverMarkers[id]); delete driverMarkers[id]; }
   }
   for (var i = 0; i < drivers.length; i++) {
     var d = drivers[i];
     if (!d.lat || !d.lng) continue;
-    if (driverMarkers[d.id]) driverMarkers[d.id].setLatLng([d.lat, d.lng]);
-    else driverMarkers[d.id] = L.marker([d.lat, d.lng], {icon: taxiIcon}).addTo(map).bindPopup("🚕 " + d.nom);
+    var taxiIcon = L.divIcon({
+      className: "",
+      html: "<div style=\"width:34px;height:34px;border-radius:50%;background:#1a1a1a;border:2px solid #f59e0b;display:flex;align-items:center;justify-content:center;font-size:16px\">🚕</div>",
+      iconSize: [34, 34],
+      iconAnchor: [17, 17]
+    });
+    if (driverMarkers[d.id]) {
+      driverMarkers[d.id].setLatLng([d.lat, d.lng]);
+    } else {
+      driverMarkers[d.id] = L.marker([d.lat, d.lng], {icon:taxiIcon})
+        .addTo(map)
+        .bindPopup("<b style='color:#f59e0b'>🚕 " + d.nom + "</b><br>" + (d.plaque || "") + "<br>⭐ " + (d.note || "5.0"));
+    }
   }
 }
 
-async function demanderCourse(chauffeurId, nom) {
+// ─── COURSE ──────────────────────────────────────────────
+async function demanderCourse(chauffeurId, nom, wa) {
   if (courseActive) { showToast("Vous avez deja une course en cours"); return; }
   if (!userLat) { showToast("Position GPS non detectee"); return; }
+  chauffeurWA = wa;
   try {
     var r = await fetch(API + "/api/course/demander", {
-      method: "POST",
-      headers: {"Content-Type": "application/json", "Authorization": "Bearer " + token},
-      body: JSON.stringify({chauffeurId: chauffeurId, lat: userLat, lng: userLng})
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer " + token},
+      body: JSON.stringify({chauffeurId:chauffeurId, lat:userLat, lng:userLng})
     });
     var d = await r.json();
     if (!r.ok) { showToast(d.error || "Erreur"); return; }
     courseActive = d.courseId;
-    document.getElementById("chauff-nom").textContent = nom + " - En attente...";
+    document.getElementById("chauff-nom").textContent = nom + " — En attente...";
     document.getElementById("course-ban").style.display = "flex";
     document.getElementById("btn-search").disabled = true;
-    showToast("Demande envoyee a " + nom + " ! En attente...");
+    showToast("Demande envoyee a " + nom + " ! En attente de confirmation...");
   } catch(e) { showToast("Erreur de connexion"); }
 }
 
@@ -442,13 +627,14 @@ async function annulerCourse() {
   if (!courseActive) return;
   try {
     var r = await fetch(API + "/api/course/annuler", {
-      method: "POST",
-      headers: {"Content-Type": "application/json", "Authorization": "Bearer " + token},
-      body: JSON.stringify({courseId: courseActive})
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer " + token},
+      body: JSON.stringify({courseId:courseActive})
     });
     var d = await r.json();
     if (!r.ok) { showToast(d.error); return; }
     courseActive = null;
+    chauffeurWA = null;
     document.getElementById("course-ban").style.display = "none";
     document.getElementById("btn-search").disabled = false;
     showToast("Course annulee");
@@ -458,24 +644,23 @@ async function annulerCourse() {
 function ouvrirWA() {
   if (!chauffeurWA) { showToast("Numero non disponible"); return; }
   var num = chauffeurWA.replace(/\D/g, "");
-  window.open("https://wa.me/" + num + "?text=Bonjour je suis votre client YalaTaxi", "_blank");
+  window.open("https://wa.me/" + num + "?text=Bonjour, je suis votre client YalaTaxi, je vous attends !", "_blank");
 }
 
 function ouvrirWADirect(wa) {
   var num = wa.replace(/\D/g, "");
-  window.open("https://wa.me/" + num + "?text=Bonjour je vous contacte via YalaTaxi", "_blank");
+  window.open("https://wa.me/" + num + "?text=Bonjour, je vous contacte via YalaTaxi", "_blank");
 }
 
 function showAnnuler() { document.getElementById("modal-annuler").classList.add("open"); }
 function fermerModal() { document.getElementById("modal-annuler").classList.remove("open"); }
 
+// ─── HISTORIQUE ──────────────────────────────────────────
 async function chargerHisto() {
   var div = document.getElementById("histo-list");
   div.innerHTML = "<div class=\"empty\"><div class=\"em\">⏳</div><p>Chargement...</p></div>";
   try {
-    var r = await fetch(API + "/api/mes-courses", {
-      headers: {"Authorization": "Bearer " + token}
-    });
+    var r = await fetch(API + "/api/mes-courses", {headers:{"Authorization":"Bearer " + token}});
     var courses = await r.json();
     if (!courses.length) {
       div.innerHTML = "<div class=\"empty\"><div class=\"em\">🚕</div><p>Aucune course pour le moment. Cherchez un taxi !</p></div>";
@@ -485,14 +670,12 @@ async function chargerHisto() {
     for (var i = 0; i < courses.length; i++) {
       var c = courses[i];
       var date = new Date(c.createdAt).toLocaleDateString("fr-FR", {day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
-      var emojis = {terminee:"✅", annulee:"❌", en_attente:"⏳", acceptee:"🚗", refusee:"⛔"};
+      var emojis = {terminee:"✅",annulee:"❌",en_attente:"⏳",acceptee:"🚗",refusee:"⛔"};
       var emoji = emojis[c.statut] || "🚗";
       var color = c.statut === "terminee" ? "var(--v)" : c.statut === "annulee" ? "var(--r)" : "var(--j)";
       html += "<div class=\"ci\">"
-        + "<div class=\"cih\">"
-        + "<p class=\"cin\">🚗 " + (c.chauffeurNom || "Chauffeur") + "</p>"
-        + "<span style=\"font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.05);color:" + color + "\">" + emoji + " " + c.statut + "</span>"
-        + "</div>"
+        + "<div class=\"cih\"><p class=\"cin\">🚗 " + (c.chauffeurNom || "Chauffeur") + "</p>"
+        + "<span style=\"font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.05);color:" + color + "\">" + emoji + " " + c.statut + "</span></div>"
         + "<p class=\"cid\">📅 " + date + "</p>"
         + (c.chauffeurWhatsapp ? "<div class=\"cdet\"><span>📱 " + c.chauffeurWhatsapp + "</span>" + (c.plaque ? "<span>🚘 " + c.plaque + "</span>" : "") + "</div>" : "")
         + "</div>";
@@ -503,6 +686,7 @@ async function chargerHisto() {
   }
 }
 
+// ─── UTILS ───────────────────────────────────────────────
 function showToast(msg) {
   var t = document.getElementById("toast");
   t.textContent = msg;
