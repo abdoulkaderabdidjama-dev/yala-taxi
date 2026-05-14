@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Generateur icone YalaTaxi</title></head>
+<body style="background:#111;display:flex;flex-direction:column;align-items:center;gap:20px;padding:30px;font-family:sans-serif;color:#fff">
+<h2 style="color:#f59e0b">Generateur d'icones YalaTaxi</h2>
+<p style="color:#888;font-size:13px">Cliquez sur chaque bouton pour telecharger les icones</p>
+<canvas id="c192" width="192" height="192" style="border-radius:24px"></canvas>
+<canvas id="c512" width="512" height="512" style="border-radius:64px;width:128px;height:128px"></canvas>
+<div style="display:flex;gap:12px">
+  <button onclick="dl(192)" style="background:#f59e0b;color:#000;border:none;padding:12px 24px;border-radius:10px;font-weight:800;cursor:pointer;font-size:14px">⬇ icon-192.png</button>
+  <button onclick="dl(512)" style="background:#f59e0b;color:#000;border:none;padding:12px 24px;border-radius:10px;font-weight:800;cursor:pointer;font-size:14px">⬇ icon-512.png</button>
+</div>
+<script>
+function dessiner(canvas, size) {
+  var ctx = canvas.getContext("2d");
+  var r = size * 0.18;
+  // Fond noir arrondi
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.lineTo(size - r, 0);
+  ctx.quadraticCurveTo(size, 0, size, r);
+  ctx.lineTo(size, size - r);
+  ctx.quadraticCurveTo(size, size, size - r, size);
+  ctx.lineTo(r, size);
+  ctx.quadraticCurveTo(0, size, 0, size - r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.fillStyle = "#0a0a0a";
+  ctx.fill();
+
+  // Cercle jaune
+  ctx.beginPath();
+  ctx.arc(size/2, size/2, size*0.36, 0, Math.PI*2);
+  ctx.fillStyle = "#f59e0b";
+  ctx.fill();
+
+  // Emoji taxi
+  ctx.font = (size * 0.38) + "px serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("🚕", size/2, size/2 + size*0.02);
+
+  // Texte YALA
+  ctx.font = "800 " + (size * 0.11) + "px sans-serif";
+  ctx.fillStyle = "#f59e0b";
+  ctx.fillText("YALATXI", size/2, size * 0.88);
+}
+
+dessiner(document.getElementById("c192"), 192);
+dessiner(document.getElementById("c512"), 512);
+
+function dl(size) {
+  var canvas = document.getElementById("c" + size);
+  var a = document.createElement("a");
+  a.download = "icon-" + size + ".png";
+  a.href = canvas.toDataURL("image/png");
+  a.click();
+}
+</script>
+</body>
+</html>
