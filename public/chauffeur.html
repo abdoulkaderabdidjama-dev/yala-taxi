@@ -451,7 +451,7 @@ function initMap() {
   map = L.map("map", {zoomControl:false, attributionControl:false}).setView([11.5883, 43.1456], 14);
 
   // Tuiles sombres style moderne
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
     maxZoom: 19,
     subdomains: "abcd"
   }).addTo(map);
