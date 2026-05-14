@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 
 const app = express();
+require('./server-icons')(app);
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
