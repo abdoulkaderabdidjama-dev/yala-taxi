@@ -13,6 +13,8 @@
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--n);color:var(--t);min-height:100vh}
 .screen{display:none;min-height:100vh;flex-direction:column}
 .screen.active{display:flex}
+
+/* AUTH */
 #screen-auth{background:var(--n);align-items:center;justify-content:center;padding:32px 24px;gap:20px}
 .logo{font-size:56px;animation:bounce 2s infinite}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -29,17 +31,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .btn{width:100%;padding:14px;border:none;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;transition:all 0.15s;font-family:inherit}
 .btn:active{transform:scale(0.98)}
 .bj{background:var(--j);color:#000}
-.bo{background:transparent;color:var(--j);border:1.5px solid var(--j)}
-.br{background:rgba(239,68,68,0.15);color:var(--r);border:1px solid rgba(239,68,68,0.3)}
 .lnk{font-size:12px;color:var(--m);text-align:center}
 .lnk a{color:var(--j);font-weight:700;cursor:pointer;text-decoration:none}
-.forgot{font-size:12px;color:var(--j);text-align:center;font-weight:700;cursor:pointer}
+.forgot{font-size:12px;color:var(--j);text-align:center;font-weight:700;cursor:pointer;margin-top:2px}
+
+/* HOME */
 #screen-home{background:var(--n)}
 .topbar{background:var(--n2);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--b)}
 .topbar-g{font-size:11px;color:var(--m)}
 .topbar-n{font-size:17px;font-weight:800;color:var(--j)}
 .ibtn{width:36px;height:36px;border-radius:50%;background:var(--n3);border:1px solid var(--b);color:var(--t);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-#map{height:220px;width:100%;z-index:1}
+
+/* MAP */
+#map{height:240px;width:100%;z-index:1;position:relative}
+.map-btns{position:absolute;top:10px;right:10px;z-index:400;display:flex;flex-direction:column;gap:6px}
+.mbtn{width:34px;height:34px;background:var(--n2);border:1px solid var(--b);border-radius:8px;color:var(--j);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:800}
+.map-info{position:absolute;bottom:10px;left:10px;z-index:400;background:rgba(10,10,10,0.85);border:1px solid var(--b);border-radius:8px;padding:5px 10px;font-size:11px;color:var(--j);font-weight:600}
+
+/* CONTENT */
 .cnt{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
 .sec{font-size:11px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.8px}
 .tog-card{background:var(--n2);border:1px solid var(--b);border-radius:var(--rad);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
@@ -53,48 +62,83 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .scard{background:var(--n2);border:1px solid var(--b);border-radius:var(--rad);padding:13px;text-align:center}
 .sval{font-size:22px;font-weight:800;color:var(--j)}
 .slbl{font-size:10px;color:var(--m);margin-top:2px}
+
+/* DEMANDE */
 .dcard{background:var(--n2);border:2px solid rgba(245,158,11,0.4);border-radius:var(--rad);padding:13px;display:flex;flex-direction:column;gap:10px;animation:pb 2s infinite}
-@keyframes pb{0%,100%{border-color:rgba(245,158,11,0.4)}50%{border-color:rgba(245,158,11,0.8)}}
+@keyframes pb{0%,100%{border-color:rgba(245,158,11,0.4)}50%{border-color:rgba(245,158,11,0.9)}}
 .dhead{display:flex;align-items:center;gap:10px}
-.av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;flex-shrink:0;background:rgba(255,255,255,0.05);color:var(--t);border:1px solid var(--b)}
+.av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;flex-shrink:0;background:rgba(245,158,11,0.1);color:var(--j);border:1px solid rgba(245,158,11,0.3)}
 .dnom{font-size:14px;font-weight:700;color:var(--j)}
 .dmeta{font-size:11px;color:var(--m);margin-top:2px}
 .ddist{font-size:11px;color:var(--j);font-weight:600}
 .dact{display:flex;gap:10px}
 .bacc{flex:1;padding:13px;background:var(--j);color:#000;border:none;border-radius:11px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
 .bref{flex:1;padding:13px;background:rgba(239,68,68,0.1);color:var(--r);border:1px solid rgba(239,68,68,0.3);border-radius:11px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
+
+/* COURSE ACTIVE */
 .cacard{background:var(--n2);border:1px solid rgba(74,222,128,0.3);border-radius:var(--rad);padding:14px;display:flex;flex-direction:column;gap:10px}
 .cat{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--v)}
 .can{font-size:17px;font-weight:800;color:var(--j)}
-.pb{height:3px;background:var(--n3);border-radius:2px;overflow:hidden}
+.pbar{height:3px;background:var(--n3);border-radius:2px;overflow:hidden}
 .pf{height:100%;background:var(--j);border-radius:2px;animation:pa 3s ease-in-out infinite alternate}
 @keyframes pa{0%{width:20%}100%{width:90%}}
 .cbtns{display:flex;gap:8px}
 .bwa{flex:1;padding:10px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.2);color:#25d366;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
 .bfin{flex:1;padding:10px;background:var(--j);color:#000;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
+
+/* EMPTY */
 .empty{background:var(--n2);border:1px solid var(--b);border-radius:var(--rad);padding:22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
 .empty .em{font-size:34px}
 .empty p{font-size:13px;color:var(--m)}
+
+/* NOTIF */
 .notif{position:fixed;top:70px;left:16px;right:16px;background:var(--j);color:#000;border-radius:var(--rad);padding:13px 16px;z-index:500;font-weight:800;font-size:14px;text-align:center;animation:sd 0.3s ease;display:none}
 @keyframes sd{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--n2);color:var(--t);border:1px solid var(--b);padding:11px 18px;border-radius:11px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;max-width:90vw;text-align:center;white-space:nowrap}
 .toast.show{opacity:1}
+
+/* NAV */
 .bnav{display:flex;background:var(--n2);border-top:1px solid var(--b);position:sticky;bottom:0;z-index:100}
-.ni{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:inherit;font-size:9px;font-weight:600;color:#444}
+.ni{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:inherit;font-size:9px;font-weight:600;color:#444;transition:color 0.2s}
 .ni.on{color:var(--j)}
 .nico{font-size:21px}
+
+/* HEADER SECONDAIRE */
 .htop{background:var(--n2);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--b);position:sticky;top:0;z-index:10}
 .hbk{width:34px;height:34px;border-radius:50%;background:var(--n3);border:1px solid var(--b);color:var(--j);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
 .htit{font-size:17px;font-weight:800;color:var(--j)}
 .hcnt{flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+
+/* HISTORIQUE */
 .ci{background:var(--n2);border:1px solid var(--b);border-radius:var(--rad);padding:14px;display:flex;flex-direction:column;gap:6px}
 .cih{display:flex;align-items:center;justify-content:space-between}
 .cin{font-size:14px;font-weight:700;color:var(--t)}
 .cid{font-size:11px;color:var(--m)}
+
+/* PROFIL */
+.profil-hero{background:var(--n2);border-bottom:1px solid var(--b);padding:24px 18px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.profil-av{width:72px;height:72px;border-radius:50%;background:rgba(245,158,11,0.15);border:2px solid var(--j);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--j)}
+.profil-nom{font-size:20px;font-weight:800;color:var(--t)}
+.profil-role{font-size:12px;color:var(--m);margin-top:-4px}
+.profil-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--b);border:1px solid var(--b);border-radius:14px;overflow:hidden;margin:0 14px}
+.pstat{background:var(--n2);padding:14px 8px;text-align:center}
+.pstat-v{font-size:20px;font-weight:800;color:var(--j)}
+.pstat-l{font-size:10px;color:var(--m);margin-top:2px}
+.prow{background:var(--n2);border:1px solid var(--b);border-radius:var(--rad);padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.prow-l{display:flex;align-items:center;gap:12px}
+.prow-ico{font-size:18px;width:32px;text-align:center}
+.prow-t{font-size:14px;font-weight:600;color:var(--t)}
+.prow-s{font-size:11px;color:var(--m);margin-top:2px}
+.prow-v{font-size:13px;color:var(--j);font-weight:700}
+.psec{font-size:11px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.8px;padding:0 2px}
+.pbtn-deco{width:100%;padding:14px;background:rgba(239,68,68,0.1);color:var(--r);border:1px solid rgba(239,68,68,0.3);border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body>
 
+<!-- ECRAN AUTH -->
 <div class="screen active" id="screen-auth">
   <div class="logo">🚗</div>
   <div class="titre">YalaTaxi</div>
@@ -103,7 +147,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   <div class="card">
     <div class="tabs">
       <button class="tab on" id="tab-login" onclick="switchTab('login')">Se connecter</button>
-      <button class="tab" id="tab-reg" onclick="switchTab('register')">S inscrire</button>
+      <button class="tab" id="tab-reg" onclick="switchTab('register')">S'inscrire</button>
     </div>
     <div id="form-login">
       <div style="display:flex;flex-direction:column;gap:10px">
@@ -122,21 +166,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
         <button class="btn bj" onclick="inscription()">Creer mon compte</button>
       </div>
     </div>
-    <p class="lnk" id="lnk-switch">Pas de compte ? <a onclick="switchTab('register')">S inscrire</a></p>
+    <p class="lnk" id="lnk-switch">Pas de compte ? <a onclick="switchTab('register')">S'inscrire</a></p>
     <p class="lnk">Vous etes client ? <a href="client.html">Espace client</a></p>
   </div>
 </div>
 
+<!-- ECRAN ACCUEIL -->
 <div class="screen" id="screen-home">
   <div class="topbar">
     <div>
       <p class="topbar-g">Bonne journee 🚗</p>
       <p class="topbar-n" id="tnom">Mohamed</p>
     </div>
-    <button class="ibtn" onclick="deconnexion()">🚪</button>
+    <button class="ibtn" onclick="deconnexion()" title="Deconnexion">🚪</button>
   </div>
   <div class="notif" id="notif">🔔 Nouvelle demande client !</div>
-  <div id="map"></div>
+  <div style="position:relative">
+    <div id="map"></div>
+    <div class="map-btns">
+      <button class="mbtn" onclick="centrerCarte()" title="Ma position">📍</button>
+      <button class="mbtn" onclick="map && map.zoomIn()" title="Zoom +">+</button>
+      <button class="mbtn" onclick="map && map.zoomOut()" title="Zoom -">−</button>
+    </div>
+    <div class="map-info" id="map-info">📡 Localisation...</div>
+  </div>
   <div class="cnt">
     <div class="tog-card" onclick="toggleStatut()">
       <div>
@@ -146,14 +199,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
       <button class="tog-sw ton" id="tog-btn"></button>
     </div>
     <div class="sgrid">
-      <div class="scard"><p class="sval" id="nb-courses">0</p><p class="slbl">Courses aujourd hui</p></div>
+      <div class="scard"><p class="sval" id="nb-courses">0</p><p class="slbl">Courses aujourd'hui</p></div>
       <div class="scard"><p class="sval">⭐ <span id="ma-note">5.0</span></p><p class="slbl">Note moyenne</p></div>
     </div>
     <div id="course-active" style="display:none">
       <div class="cacard">
-        <p class="cat">🚖 Course acceptee</p>
+        <p class="cat">🚖 Course en cours</p>
         <p class="can" id="client-nom">—</p>
-        <div class="pb"><div class="pf"></div></div>
+        <div class="pbar"><div class="pf"></div></div>
         <div class="cbtns">
           <button class="bwa" onclick="ouvrirWA()">📞 WhatsApp</button>
           <button class="bfin" onclick="terminerCourse()">✅ Terminer</button>
@@ -164,20 +217,101 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
     <div id="demandes"></div>
   </div>
   <div class="bnav">
-    <button class="ni on" onclick="retourAccueil()"><span class="nico">🏠</span>Accueil</button>
-    <button class="ni" onclick="voirHisto()"><span class="nico">📋</span>Courses</button>
-    <button class="ni" onclick="voirAvis()"><span class="nico">⭐</span>Avis</button>
-    <button class="ni" onclick="voirProfil()"><span class="nico">👤</span>Profil</button>
+    <button class="ni on" id="nav-accueil" onclick="allerAccueil()"><span class="nico">🏠</span>Accueil</button>
+    <button class="ni" id="nav-histo" onclick="allerHisto()"><span class="nico">📋</span>Courses</button>
+    <button class="ni" id="nav-avis" onclick="allerAvis()"><span class="nico">⭐</span>Avis</button>
+    <button class="ni" id="nav-profil" onclick="allerProfil()"><span class="nico">👤</span>Profil</button>
   </div>
 </div>
 
+<!-- ECRAN HISTORIQUE -->
 <div class="screen" id="screen-histo">
   <div class="htop">
-    <button class="hbk" onclick="retourAccueil()">←</button>
+    <button class="hbk" onclick="allerAccueil()">←</button>
     <p class="htit">📋 Mes Courses</p>
   </div>
   <div class="hcnt" id="histo-list">
     <div class="empty"><div class="em">⏳</div><p>Chargement...</p></div>
+  </div>
+  <div class="bnav">
+    <button class="ni" id="nav-accueil2" onclick="allerAccueil()"><span class="nico">🏠</span>Accueil</button>
+    <button class="ni on" id="nav-histo2" onclick="allerHisto()"><span class="nico">📋</span>Courses</button>
+    <button class="ni" id="nav-avis2" onclick="allerAvis()"><span class="nico">⭐</span>Avis</button>
+    <button class="ni" id="nav-profil2" onclick="allerProfil()"><span class="nico">👤</span>Profil</button>
+  </div>
+</div>
+
+<!-- ECRAN AVIS -->
+<div class="screen" id="screen-avis">
+  <div class="htop">
+    <button class="hbk" onclick="allerAccueil()">←</button>
+    <p class="htit">⭐ Mes Avis</p>
+  </div>
+  <div class="hcnt" id="avis-list">
+    <div class="empty"><div class="em">⭐</div><p>Aucun avis pour le moment</p><p style="font-size:11px;color:#555;margin-top:4px">Les clients laisseront des avis apres chaque course</p></div>
+  </div>
+  <div class="bnav">
+    <button class="ni" onclick="allerAccueil()"><span class="nico">🏠</span>Accueil</button>
+    <button class="ni" onclick="allerHisto()"><span class="nico">📋</span>Courses</button>
+    <button class="ni on"><span class="nico">⭐</span>Avis</button>
+    <button class="ni" onclick="allerProfil()"><span class="nico">👤</span>Profil</button>
+  </div>
+</div>
+
+<!-- ECRAN PROFIL -->
+<div class="screen" id="screen-profil">
+  <div class="htop">
+    <button class="hbk" onclick="allerAccueil()">←</button>
+    <p class="htit">👤 Mon Profil</p>
+  </div>
+  <div class="hcnt">
+    <div class="profil-hero">
+      <div class="profil-av" id="profil-initiale">M</div>
+      <p class="profil-nom" id="profil-nom">Mohamed</p>
+      <p class="profil-role">🚗 Chauffeur YalaTaxi</p>
+    </div>
+    <div class="profil-stats">
+      <div class="pstat"><p class="pstat-v" id="profil-courses">0</p><p class="pstat-l">Courses</p></div>
+      <div class="pstat"><p class="pstat-v" id="profil-note">5.0</p><p class="pstat-l">Note ⭐</p></div>
+      <div class="pstat"><p class="pstat-v" id="profil-statut-p">🟢</p><p class="pstat-l">Statut</p></div>
+    </div>
+    <p class="psec">Informations</p>
+    <div class="prow">
+      <div class="prow-l">
+        <span class="prow-ico">📱</span>
+        <div><p class="prow-t">WhatsApp</p><p class="prow-s">Numero de contact</p></div>
+      </div>
+      <span class="prow-v" id="profil-wa">—</span>
+    </div>
+    <div class="prow">
+      <div class="prow-l">
+        <span class="prow-ico">🚘</span>
+        <div><p class="prow-t">Plaque</p><p class="prow-s">Immatriculation</p></div>
+      </div>
+      <span class="prow-v" id="profil-plaque">—</span>
+    </div>
+    <div class="prow" onclick="copierWA()" style="cursor:pointer">
+      <div class="prow-l">
+        <span class="prow-ico">🔗</span>
+        <div><p class="prow-t">Partager mon lien</p><p class="prow-s">Inviter un client sur WhatsApp</p></div>
+      </div>
+      <span class="prow-v">→</span>
+    </div>
+    <p class="psec">Compte</p>
+    <div class="prow" onclick="window.location.href='reset.html'" style="cursor:pointer">
+      <div class="prow-l">
+        <span class="prow-ico">🔑</span>
+        <div><p class="prow-t">Changer mon mot de passe</p><p class="prow-s">Via reset.html</p></div>
+      </div>
+      <span class="prow-v">→</span>
+    </div>
+    <button class="pbtn-deco" onclick="deconnexion()">🚪 Se deconnecter</button>
+  </div>
+  <div class="bnav">
+    <button class="ni" onclick="allerAccueil()"><span class="nico">🏠</span>Accueil</button>
+    <button class="ni" onclick="allerHisto()"><span class="nico">📋</span>Courses</button>
+    <button class="ni" onclick="allerAvis()"><span class="nico">⭐</span>Avis</button>
+    <button class="ni on"><span class="nico">👤</span>Profil</button>
   </div>
 </div>
 
@@ -191,21 +325,23 @@ var socket = null, map = null, userMarker = null;
 var userLat = null, userLng = null, enLigne = true;
 var courseActiveId = null, clientWA = null, nbCourses = 0;
 
+// ─── INIT ───────────────────────────────────────────────
 window.onload = function() {
   if (token && user && user.role === "chauffeur") {
-    afficherAccueil();
+    allerAccueil();
   } else {
     afficherDemandes("vide");
   }
 };
 
+// ─── AUTH ────────────────────────────────────────────────
 function switchTab(tab) {
   document.getElementById("form-login").style.display = tab === "login" ? "block" : "none";
   document.getElementById("form-reg").style.display = tab === "register" ? "block" : "none";
   document.getElementById("tab-login").className = "tab" + (tab === "login" ? " on" : "");
   document.getElementById("tab-reg").className = "tab" + (tab === "register" ? " on" : "");
   document.getElementById("lnk-switch").innerHTML = tab === "login"
-    ? "Pas de compte ? <a onclick=\"switchTab('register')\">S inscrire</a>"
+    ? "Pas de compte ? <a onclick=\"switchTab('register')\">S'inscrire</a>"
     : "Deja un compte ? <a onclick=\"switchTab('login')\">Se connecter</a>";
 }
 
@@ -217,14 +353,13 @@ async function inscription() {
   if (!nom || !wa || !plaque || !pw) { showToast("Remplissez tous les champs"); return; }
   try {
     var r = await fetch(API + "/api/inscription", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({nom: nom, whatsapp: wa, role: "chauffeur", password: pw, plaque: plaque})
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({nom:nom, whatsapp:wa, role:"chauffeur", password:pw, plaque:plaque})
     });
     var d = await r.json();
     if (!r.ok) { showToast(d.error || "Erreur"); return; }
     saveSession(d.token, d.user);
-    afficherAccueil();
+    allerAccueil();
   } catch(e) { showToast("Impossible de contacter le serveur"); }
 }
 
@@ -234,15 +369,14 @@ async function connexion() {
   if (!wa || !pw) { showToast("Remplissez tous les champs"); return; }
   try {
     var r = await fetch(API + "/api/connexion", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({whatsapp: wa, password: pw})
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({whatsapp:wa, password:pw})
     });
     var d = await r.json();
     if (!r.ok) { showToast(d.error || "Erreur"); return; }
     if (d.user.role !== "chauffeur") { showToast("Ce compte est un compte client"); return; }
     saveSession(d.token, d.user);
-    afficherAccueil();
+    allerAccueil();
   } catch(e) { showToast("Impossible de contacter le serveur"); }
 }
 
@@ -259,42 +393,133 @@ function deconnexion() {
   location.reload();
 }
 
-function afficherAccueil() {
-  document.getElementById("screen-auth").classList.remove("active");
-  document.getElementById("screen-histo").classList.remove("active");
-  document.getElementById("screen-home").classList.add("active");
-  document.getElementById("tnom").textContent = user.nom;
-  document.getElementById("ma-note").textContent = user.note || "5.0";
-  afficherDemandes("vide");
-  initMap();
-  initSocket();
-  detecterPos();
+// ─── NAVIGATION ──────────────────────────────────────────
+function cacherTous() {
+  ["screen-auth","screen-home","screen-histo","screen-avis","screen-profil"].forEach(function(id) {
+    document.getElementById(id).classList.remove("active");
+  });
 }
 
-function voirHisto() {
-  document.getElementById("screen-home").classList.remove("active");
+function allerAccueil() {
+  cacherTous();
+  document.getElementById("screen-home").classList.add("active");
+  if (!map) { initMap(); detecterPos(); }
+  if (!socket) initSocket();
+}
+
+function allerHisto() {
+  cacherTous();
   document.getElementById("screen-histo").classList.add("active");
   chargerHisto();
 }
 
-function retourAccueil() {
-  document.getElementById("screen-histo").classList.remove("active");
-  document.getElementById("screen-home").classList.add("active");
+function allerAvis() {
+  cacherTous();
+  document.getElementById("screen-avis").classList.add("active");
 }
 
-function voirAvis() { showToast("Avis - bientot disponible"); }
-function voirProfil() { showToast(user.nom + " - " + (user.plaque || "") + " - " + (user.note || "5.0")); }
+function allerProfil() {
+  cacherTous();
+  document.getElementById("screen-profil").classList.add("active");
+  remplirProfil();
+}
 
+function remplirProfil() {
+  if (!user) return;
+  var initiale = (user.nom || "?").charAt(0).toUpperCase();
+  document.getElementById("profil-initiale").textContent = initiale;
+  document.getElementById("profil-nom").textContent = user.nom || "—";
+  document.getElementById("profil-wa").textContent = user.whatsapp || "—";
+  document.getElementById("profil-plaque").textContent = user.plaque || "—";
+  document.getElementById("profil-note").textContent = user.note || "5.0";
+  document.getElementById("profil-courses").textContent = nbCourses;
+  document.getElementById("profil-statut-p").textContent = enLigne ? "🟢" : "🔴";
+}
+
+function copierWA() {
+  var lien = "https://yala-taxi.onrender.com/client.html";
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(lien).then(function() { showToast("Lien copie ! Partagez-le sur WhatsApp"); });
+  } else {
+    showToast("Lien: " + lien);
+  }
+}
+
+// ─── CARTE ───────────────────────────────────────────────
 function initMap() {
   if (map) return;
-  map = L.map("map", {zoomControl: false}).setView([11.5883, 43.1456], 14);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {attribution: "OpenStreetMap"}).addTo(map);
+  map = L.map("map", {zoomControl:false, attributionControl:false}).setView([11.5883, 43.1456], 14);
+
+  // Tuiles sombres style moderne
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+    maxZoom: 19,
+    subdomains: "abcd"
+  }).addTo(map);
+
+  // Attribution discrète
+  L.control.attribution({prefix: false, position:"bottomleft"}).addTo(map);
+
+  // Clic sur carte pour voir l'adresse
+  map.on("click", function(e) {
+    showToast("📍 " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4));
+  });
 }
 
+function detecterPos() {
+  if (!navigator.geolocation) {
+    document.getElementById("map-info").textContent = "GPS non disponible";
+    return;
+  }
+  navigator.geolocation.watchPosition(function(pos) {
+    userLat = pos.coords.latitude;
+    userLng = pos.coords.longitude;
+    var acc = Math.round(pos.coords.accuracy);
+    document.getElementById("map-info").textContent = "📍 Precision " + acc + "m";
+
+    if (map) {
+      if (!userMarker) {
+        // Marqueur chauffeur avec style personnalise
+        var icon = L.divIcon({
+          className: "",
+          html: "<div style=\"width:40px;height:40px;border-radius:50%;background:#f59e0b;border:3px solid #000;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 0 4px rgba(245,158,11,0.3)\">🚗</div>",
+          iconSize: [40, 40],
+          iconAnchor: [20, 20]
+        });
+        userMarker = L.marker([userLat, userLng], {icon:icon}).addTo(map);
+        userMarker.bindPopup("<b style='color:#f59e0b'>" + (user ? user.nom : "Vous") + "</b><br>Votre position actuelle");
+        map.setView([userLat, userLng], 15);
+      } else {
+        userMarker.setLatLng([userLat, userLng]);
+      }
+    }
+    if (socket && enLigne) {
+      socket.emit("position_update", {userId:user.id, lat:userLat, lng:userLng, role:"chauffeur"});
+      fetch(API + "/api/chauffeur/position", {
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer " + token},
+        body: JSON.stringify({lat:userLat, lng:userLng})
+      }).catch(function(){});
+    }
+  }, function(err) {
+    userLat = 11.5883; userLng = 43.1456;
+    document.getElementById("map-info").textContent = "⚠️ GPS non disponible";
+  }, {enableHighAccuracy:true, maximumAge:5000});
+}
+
+function centrerCarte() {
+  if (map && userLat) {
+    map.setView([userLat, userLng], 16);
+    if (userMarker) userMarker.openPopup();
+  } else {
+    showToast("Position non disponible");
+  }
+}
+
+// ─── SOCKET ──────────────────────────────────────────────
 function initSocket() {
   socket = io(API);
   socket.on("connect", function() {
-    socket.emit("register", {userId: user.id, role: "chauffeur"});
+    if (user) socket.emit("register", {userId:user.id, role:"chauffeur"});
   });
   socket.on("nouvelle_demande", function(data) {
     clientWA = data.client.whatsapp;
@@ -305,37 +530,16 @@ function initSocket() {
     if (data.par === "client") {
       courseActiveId = null; clientWA = null;
       document.getElementById("course-active").style.display = "none";
-      showToast("Le client a annule la course");
+      showToast("⚠️ Le client a annule la course");
       changerStatut("libre");
     }
   });
 }
 
-function detecterPos() {
-  if (!navigator.geolocation) return;
-  navigator.geolocation.watchPosition(function(pos) {
-    userLat = pos.coords.latitude;
-    userLng = pos.coords.longitude;
-    if (map) {
-      map.setView([userLat, userLng], 15);
-      if (userMarker) userMarker.setLatLng([userLat, userLng]);
-      else userMarker = L.circleMarker([userLat, userLng], {radius:12, fillColor:"#f59e0b", color:"#000", weight:3, fillOpacity:1}).addTo(map);
-    }
-    if (socket && enLigne) {
-      socket.emit("position_update", {userId: user.id, lat: userLat, lng: userLng, role: "chauffeur"});
-      fetch(API + "/api/chauffeur/position", {
-        method: "POST",
-        headers: {"Content-Type":"application/json","Authorization":"Bearer " + token},
-        body: JSON.stringify({lat: userLat, lng: userLng})
-      }).catch(function(){});
-    }
-  }, function() { userLat = 11.5883; userLng = 43.1456; }, {enableHighAccuracy: true});
-}
-
+// ─── STATUT ──────────────────────────────────────────────
 async function toggleStatut() {
-  if (courseActiveId) { showToast("Terminez la course en cours d abord"); return; }
+  if (courseActiveId) { showToast("Terminez la course en cours d'abord"); return; }
   enLigne = !enLigne;
-  var statut = enLigne ? "libre" : "hors_ligne";
   var btn = document.getElementById("tog-btn");
   var lbl = document.getElementById("tog-lbl");
   var sub = document.getElementById("tog-sub");
@@ -343,25 +547,27 @@ async function toggleStatut() {
     btn.className = "tog-sw ton";
     lbl.textContent = "🟢 Disponible";
     sub.textContent = "Les clients peuvent vous voir";
+    await changerStatut("libre");
   } else {
     btn.className = "tog-sw toff";
     lbl.textContent = "🔴 Hors ligne";
     sub.textContent = "Vous etes invisible pour les clients";
     afficherDemandes("offline");
+    await changerStatut("hors_ligne");
   }
-  await changerStatut(statut);
 }
 
 async function changerStatut(statut) {
   try {
     await fetch(API + "/api/chauffeur/statut", {
-      method: "POST",
-      headers: {"Content-Type":"application/json","Authorization":"Bearer " + token},
-      body: JSON.stringify({statut: statut})
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer " + token},
+      body: JSON.stringify({statut:statut})
     });
   } catch(e) {}
 }
 
+// ─── DEMANDES ────────────────────────────────────────────
 function afficherDemandes(type) {
   var div = document.getElementById("demandes");
   if (type === "offline") {
@@ -376,6 +582,18 @@ function afficherDemande(data) {
   if (data.client.lat && userLat) {
     var d = calcDist(userLat, userLng, data.client.lat, data.client.lng);
     dist = d < 1 ? Math.round(d*1000) + "m" : d.toFixed(1) + "km";
+    // Marqueur client sur la carte
+    if (map) {
+      var clientIcon = L.divIcon({
+        className:"",
+        html:"<div style=\"width:36px;height:36px;border-radius:50%;background:#1a1a1a;border:3px solid #f59e0b;display:flex;align-items:center;justify-content:center;font-size:16px\">👤</div>",
+        iconSize:[36,36], iconAnchor:[18,18]
+      });
+      L.marker([data.client.lat, data.client.lng], {icon:clientIcon})
+        .addTo(map)
+        .bindPopup("<b style='color:#f59e0b'>" + data.client.nom + "</b><br>Client en attente")
+        .openPopup();
+    }
   }
   var div = document.getElementById("demandes");
   div.innerHTML = "<div class=\"dcard\">"
@@ -394,9 +612,9 @@ function afficherDemande(data) {
 async function repondre(courseId, decision, clientNom) {
   try {
     var r = await fetch(API + "/api/course/repondre", {
-      method: "POST",
-      headers: {"Content-Type":"application/json","Authorization":"Bearer " + token},
-      body: JSON.stringify({courseId: courseId, decision: decision})
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer " + token},
+      body: JSON.stringify({courseId:courseId, decision:decision})
     });
     var d = await r.json();
     if (!r.ok) { showToast(d.error); return; }
@@ -407,7 +625,7 @@ async function repondre(courseId, decision, clientNom) {
       document.getElementById("demandes").innerHTML = "<div class=\"empty\"><div class=\"em\">🚗</div><p>Course en cours avec " + clientNom + "</p></div>";
       nbCourses++;
       document.getElementById("nb-courses").textContent = nbCourses;
-      showToast("Course acceptee ! En route vers le client");
+      showToast("Course acceptee ! En route vers " + clientNom);
     } else {
       courseActiveId = null; enLigne = true;
       afficherDemandes("vide");
@@ -421,15 +639,15 @@ async function terminerCourse() {
   if (!courseActiveId) return;
   try {
     var r = await fetch(API + "/api/course/terminer", {
-      method: "POST",
-      headers: {"Content-Type":"application/json","Authorization":"Bearer " + token},
-      body: JSON.stringify({courseId: courseActiveId})
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer " + token},
+      body: JSON.stringify({courseId:courseActiveId})
     });
     if (!r.ok) { showToast("Erreur"); return; }
     courseActiveId = null; clientWA = null;
     document.getElementById("course-active").style.display = "none";
     afficherDemandes("vide");
-    showToast("Course terminee ! Bien joue");
+    showToast("✅ Course terminee ! Bien joue");
     enLigne = true;
     await changerStatut("libre");
   } catch(e) { showToast("Erreur"); }
@@ -444,22 +662,15 @@ function afficherNotif() {
 function ouvrirWA() {
   if (!clientWA) { showToast("Numero non disponible"); return; }
   var num = clientWA.replace(/\D/g, "");
-  window.open("https://wa.me/" + num + "?text=Bonjour je suis votre chauffeur YalaTaxi", "_blank");
+  window.open("https://wa.me/" + num + "?text=Bonjour je suis votre chauffeur YalaTaxi, je suis en route !", "_blank");
 }
 
-function calcDist(lat1, lng1, lat2, lng2) {
-  var R = 6371;
-  var dLat = (lat2-lat1)*Math.PI/180;
-  var dLng = (lng2-lng1)*Math.PI/180;
-  var a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
+// ─── HISTORIQUE ──────────────────────────────────────────
 async function chargerHisto() {
   var div = document.getElementById("histo-list");
   div.innerHTML = "<div class=\"empty\"><div class=\"em\">⏳</div><p>Chargement...</p></div>";
   try {
-    var r = await fetch(API + "/api/mes-courses", {headers: {"Authorization": "Bearer " + token}});
+    var r = await fetch(API + "/api/mes-courses", {headers:{"Authorization":"Bearer " + token}});
     var courses = await r.json();
     if (!courses.length) {
       div.innerHTML = "<div class=\"empty\"><div class=\"em\">🚗</div><p>Aucune course pour le moment</p></div>";
@@ -479,6 +690,15 @@ async function chargerHisto() {
   } catch(e) {
     div.innerHTML = "<div class=\"empty\"><div class=\"em\">❌</div><p>Erreur de chargement</p></div>";
   }
+}
+
+// ─── UTILS ───────────────────────────────────────────────
+function calcDist(lat1, lng1, lat2, lng2) {
+  var R = 6371;
+  var dLat = (lat2-lat1)*Math.PI/180;
+  var dLng = (lng2-lng1)*Math.PI/180;
+  var a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 function showToast(msg) {
