@@ -2,29 +2,153 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YalaTaxi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>YalaTaxi — Djibouti</title>
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#f59e0b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="YalaTaxi">
+<link rel="apple-touch-icon" href="/icon-192.png">
+
+<!-- SEO -->
+<meta name="description" content="Trouvez un taxi a Djibouti en quelques secondes avec YalaTaxi">
+
 <style>
-  body { font-family: sans-serif; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; min-height: 100vh;
-    background: #1e3a8a; color: #fff; gap: 20px; text-align: center; padding: 24px; }
-  h1 { font-size: 36px; font-weight: 800; }
-  p { opacity: 0.7; font-size: 15px; }
-  .btns { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
-  a { padding: 16px 32px; border-radius: 14px; font-size: 16px; font-weight: 700;
-    text-decoration: none; transition: opacity 0.2s; }
-  a:hover { opacity: 0.85; }
-  .btn-c { background: #fff; color: #1e3a8a; }
-  .btn-d { background: #d97706; color: #fff; }
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--j:#f59e0b;--n:#0a0a0a;--n2:#111111;--b:#2a2a2a;--m:#666}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--n);color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:0;overflow:hidden}
+
+/* BG animé */
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden}
+.bg-c{position:absolute;border-radius:50%;background:rgba(245,158,11,0.06);animation:bgpulse 4s ease-in-out infinite}
+.bg-c:nth-child(1){width:400px;height:400px;top:-100px;right:-100px;animation-delay:0s}
+.bg-c:nth-child(2){width:300px;height:300px;bottom:-80px;left:-80px;animation-delay:2s}
+@keyframes bgpulse{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.1);opacity:1}}
+
+.wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:24px;max-width:400px;width:100%}
+
+/* Logo */
+.logo-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+.logo-ico{font-size:72px;animation:bounce 2.5s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.logo-txt{font-size:38px;font-weight:900;color:var(--j);letter-spacing:-2px}
+.logo-sub{font-size:13px;color:var(--m);text-align:center;line-height:1.5}
+
+/* Badge */
+.badge{background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:var(--j);font-size:11px;font-weight:700;padding:5px 16px;border-radius:20px;letter-spacing:0.5px}
+
+/* Boutons */
+.btns{display:flex;flex-direction:column;gap:12px;width:100%}
+.btn{width:100%;padding:18px;border:none;border-radius:16px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none}
+.btn:active{transform:scale(0.97)}
+.btn-c{background:var(--j);color:#000}
+.btn-d{background:var(--n2);color:var(--j);border:1.5px solid rgba(245,158,11,0.4)}
+
+/* Install banner */
+.install-banner{width:100%;background:var(--n2);border:1px solid rgba(245,158,11,0.3);border-radius:14px;padding:14px 16px;display:none;align-items:center;gap:12px;cursor:pointer}
+.install-banner.show{display:flex}
+.ib-ico{font-size:26px;flex-shrink:0}
+.ib-txt{flex:1}
+.ib-t{font-size:13px;font-weight:700;color:var(--j)}
+.ib-s{font-size:11px;color:var(--m);margin-top:2px}
+.ib-btn{background:var(--j);color:#000;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;font-family:inherit}
+
+/* iOS guide */
+.ios-guide{width:100%;background:var(--n2);border:1px solid var(--b);border-radius:14px;padding:14px 16px;display:none}
+.ios-guide.show{display:block}
+.ig-t{font-size:13px;font-weight:700;color:var(--j);margin-bottom:8px}
+.ig-step{font-size:12px;color:#888;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.ig-num{width:20px;height:20px;border-radius:50%;background:rgba(245,158,11,0.15);color:var(--j);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* Footer */
+.footer{font-size:11px;color:#333;text-align:center}
 </style>
 </head>
 <body>
-  <div style="font-size:64px">🚕</div>
-  <h1>YalaTaxi</h1>
-  <p>Connectez chauffeurs et clients à Djibouti</p>
-  <div class="btns">
-    <a href="/client.html" class="btn-c">🧑 Je suis Client</a>
-    <a href="/chauffeur.html" class="btn-d">🚗 Je suis Chauffeur</a>
+
+<div class="bg">
+  <div class="bg-c"></div>
+  <div class="bg-c"></div>
+</div>
+
+<div class="wrap">
+  <div class="logo-wrap">
+    <div class="logo-ico">🚕</div>
+    <div class="logo-txt">YalaTaxi</div>
+    <div class="logo-sub">Connectez-vous avec un chauffeur<br>en quelques secondes a Djibouti</div>
   </div>
+
+  <span class="badge">🇩🇯 Disponible a Djibouti</span>
+
+  <!-- Bouton installer (Android Chrome) -->
+  <div class="install-banner" id="install-banner" onclick="installerApp()">
+    <div class="ib-ico">📲</div>
+    <div class="ib-txt">
+      <p class="ib-t">Installer YalaTaxi</p>
+      <p class="ib-s">Comme une vraie app sur votre telephone</p>
+    </div>
+    <button class="ib-btn">Installer</button>
+  </div>
+
+  <!-- Guide iOS -->
+  <div class="ios-guide" id="ios-guide">
+    <p class="ig-t">📲 Installer sur iPhone</p>
+    <div class="ig-step"><div class="ig-num">1</div>Appuyez sur le bouton <b style="color:#fff">Partager</b> ↑ en bas</div>
+    <div class="ig-step"><div class="ig-num">2</div>Selectionnez <b style="color:#fff">"Sur l'ecran d'accueil"</b></div>
+    <div class="ig-step"><div class="ig-num">3</div>Appuyez sur <b style="color:#fff">"Ajouter"</b> en haut a droite</div>
+  </div>
+
+  <div class="btns">
+    <a href="/client.html" class="btn btn-c">🧑 Je suis Client</a>
+    <a href="/chauffeur.html" class="btn btn-d">🚗 Je suis Chauffeur</a>
+  </div>
+
+  <p class="footer">YalaTaxi &copy; 2025 — Djibouti</p>
+</div>
+
+<script>
+// Enregistrer le service worker
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js")
+    .then(function(reg) { console.log("SW OK:", reg.scope); })
+    .catch(function(err) { console.log("SW erreur:", err); });
+}
+
+// Bouton installer Android (Chrome)
+var deferredPrompt = null;
+window.addEventListener("beforeinstallprompt", function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById("install-banner").classList.add("show");
+});
+
+function installerApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(function(result) {
+    if (result.outcome === "accepted") {
+      document.getElementById("install-banner").classList.remove("show");
+    }
+    deferredPrompt = null;
+  });
+}
+
+// Guide iOS (Safari)
+var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+var isInStandalone = window.navigator.standalone === true;
+if (isIOS && !isInStandalone) {
+  document.getElementById("ios-guide").classList.add("show");
+}
+
+// App deja installee
+window.addEventListener("appinstalled", function() {
+  document.getElementById("install-banner").classList.remove("show");
+  document.getElementById("ios-guide").classList.remove("show");
+});
+</script>
 </body>
 </html>
