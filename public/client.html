@@ -195,7 +195,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   <div class="topbar">
     <div>
       <p class="topbar-g">Bonjour 👋</p>
-      <p class="topbar-n" id="tnom">Ahmed</p>
+      <p class="topbar-n" id="tnom">...</p>
     </div>
     <button class="ibtn" onclick="deconnexion()" title="Deconnexion">🚪</button>
   </div>
@@ -319,7 +319,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 <div class="toast" id="toast"></div>
 
 <script>
-// Service Worker PWA
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(function(){});
 }
@@ -331,12 +330,10 @@ var socket = null, map = null, userMarker = null, driverMarkers = {};
 var userLat = null, userLng = null, courseActive = null, chauffeurWA = null;
 var nbCourses = 0;
 
-// ─── INIT ───────────────────────────────────────────────
 window.onload = function() {
   if (token && user && user.role === "client") allerAccueil();
 };
 
-// ─── AUTH ────────────────────────────────────────────────
 function switchTab(tab) {
   document.getElementById("form-login").style.display = tab === "login" ? "block" : "none";
   document.getElementById("form-reg").style.display = tab === "register" ? "block" : "none";
@@ -393,7 +390,6 @@ function deconnexion() {
   location.reload();
 }
 
-// ─── NAVIGATION ──────────────────────────────────────────
 function cacherTous() {
   ["screen-auth","screen-home","screen-histo","screen-profil"].forEach(function(id) {
     document.getElementById(id).classList.remove("active");
@@ -427,7 +423,6 @@ function remplirProfil() {
   document.getElementById("profil-nom").textContent = user.nom || "—";
   document.getElementById("profil-wa").textContent = user.whatsapp || "—";
   document.getElementById("profil-courses").textContent = nbCourses;
-  // Date membre
   var now = new Date();
   var mois = ["Jan","Fev","Mar","Avr","Mai","Juin","Juil","Aout","Sep","Oct","Nov","Dec"];
   document.getElementById("profil-membre").textContent = mois[now.getMonth()] + " " + now.getFullYear();
@@ -444,17 +439,12 @@ function partagerAppli() {
   }
 }
 
-// ─── CARTE ───────────────────────────────────────────────
 function initMap() {
   if (map) return;
   map = L.map("map", {zoomControl:false, attributionControl:false}).setView([11.5883, 43.1456], 14);
-
-  // Tuiles sombres modernes
   L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-    maxZoom: 19,
-    subdomains: "abcd"
+    maxZoom: 19, subdomains: "abcd"
   }).addTo(map);
-
   map.on("click", function(e) {
     showToast("📍 " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4));
   });
@@ -480,14 +470,12 @@ function detecterPos() {
     var acc = Math.round(pos.coords.accuracy);
     document.getElementById("pos-txt").textContent = userLat.toFixed(4) + ", " + userLng.toFixed(4);
     document.getElementById("map-info").textContent = "📍 Precision " + acc + "m";
-
     if (map) {
       if (!userMarker) {
         var icon = L.divIcon({
           className: "",
           html: "<div style=\"width:38px;height:38px;border-radius:50%;background:#f59e0b;border:3px solid #000;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 0 0 4px rgba(245,158,11,0.3)\">🧑</div>",
-          iconSize: [38, 38],
-          iconAnchor: [19, 19]
+          iconSize: [38, 38], iconAnchor: [19, 19]
         });
         userMarker = L.marker([userLat, userLng], {icon:icon}).addTo(map);
         userMarker.bindPopup("<b style='color:#f59e0b'>" + (user ? user.nom : "Vous") + "</b><br>Votre position");
@@ -513,7 +501,6 @@ function centrerCarte() {
   }
 }
 
-// ─── SOCKET ──────────────────────────────────────────────
 function initSocket() {
   socket = io(API);
   socket.on("connect", function() {
@@ -522,7 +509,8 @@ function initSocket() {
   socket.on("drivers_updated", function(drivers) {
     majMarqueurs(drivers);
   });
-  socket.on("course_acceptee", function(data) {
+  // ✅ CORRIGE : accents alignes avec le serveur
+  socket.on("course_acceptée", function(data) {
     courseActive = data.courseId;
     chauffeurWA = data.chauffeur.whatsapp;
     document.getElementById("chauff-nom").textContent = data.chauffeur.nom + " — " + (data.chauffeur.plaque || "");
@@ -532,27 +520,28 @@ function initSocket() {
     nbCourses++;
     showToast("✅ Le chauffeur a accepte votre course !");
   });
-  socket.on("course_refusee", function() {
+  socket.on("course_refusée", function() {
     courseActive = null;
     document.getElementById("btn-search").disabled = false;
     showToast("Le chauffeur a refuse. Essayez un autre.");
   });
-  socket.on("course_annulee", function() {
+  socket.on("course_annulée", function() {
     courseActive = null;
+    chauffeurWA = null;
     document.getElementById("course-ban").style.display = "none";
     document.getElementById("btn-search").disabled = false;
     showToast("Course annulee par le chauffeur");
     rechercherTaxis();
   });
-  socket.on("course_terminee", function() {
+  socket.on("course_terminée", function() {
     courseActive = null;
+    chauffeurWA = null;
     document.getElementById("course-ban").style.display = "none";
     document.getElementById("btn-search").disabled = false;
     showToast("🎉 Course terminee ! Merci d'utiliser YalaTaxi");
   });
 }
 
-// ─── RECHERCHE ───────────────────────────────────────────
 async function rechercherTaxis() {
   var btn = document.getElementById("btn-search");
   btn.innerHTML = "<span class=\"loader\"></span>Recherche...";
@@ -610,8 +599,7 @@ function majMarqueurs(drivers) {
     var taxiIcon = L.divIcon({
       className: "",
       html: "<div style=\"width:34px;height:34px;border-radius:50%;background:#1a1a1a;border:2px solid #f59e0b;display:flex;align-items:center;justify-content:center;font-size:16px\">🚕</div>",
-      iconSize: [34, 34],
-      iconAnchor: [17, 17]
+      iconSize: [34, 34], iconAnchor: [17, 17]
     });
     if (driverMarkers[d.id]) {
       driverMarkers[d.id].setLatLng([d.lat, d.lng]);
@@ -623,7 +611,6 @@ function majMarqueurs(drivers) {
   }
 }
 
-// ─── COURSE ──────────────────────────────────────────────
 async function demanderCourse(chauffeurId, nom, wa) {
   if (courseActive) { showToast("Vous avez deja une course en cours"); return; }
   if (!userLat) { showToast("Position GPS non detectee"); return; }
@@ -677,7 +664,6 @@ function ouvrirWADirect(wa) {
 function showAnnuler() { document.getElementById("modal-annuler").classList.add("open"); }
 function fermerModal() { document.getElementById("modal-annuler").classList.remove("open"); }
 
-// ─── HISTORIQUE ──────────────────────────────────────────
 async function chargerHisto() {
   var div = document.getElementById("histo-list");
   div.innerHTML = "<div class=\"empty\"><div class=\"em\">⏳</div><p>Chargement...</p></div>";
@@ -708,7 +694,6 @@ async function chargerHisto() {
   }
 }
 
-// ─── UTILS ───────────────────────────────────────────────
 function showToast(msg) {
   var t = document.getElementById("toast");
   t.textContent = msg;
