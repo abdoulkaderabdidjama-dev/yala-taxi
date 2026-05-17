@@ -418,6 +418,11 @@ function cacherTous() {
 function allerAccueil() {
   cacherTous();
   document.getElementById("screen-home").classList.add("active");
+  // Mettre le vrai nom dès le chargement de l'accueil
+  if (user) {
+    document.getElementById("tnom").textContent = user.nom || "—";
+    document.getElementById("ma-note").textContent = user.note || "5.0";
+  }
   if (!map) { initMap(); detecterPos(); }
   if (!socket) initSocket();
 }
