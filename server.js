@@ -136,17 +136,23 @@ app.post('/api/chauffeur/position', authMiddleware, async (req, res) => {
   res.json({ ok: true });
 });
 
-app.post('/api/chauffeur/statut', authMiddleware, async (req, res) => {
+app.post('/api/chauffeur/position', authMiddleware, async (req, res) => {
   if (req.user.role!=='chauffeur') return res.status(403).json({ error: 'Réservé aux chauffeurs' });
-  const { statut } = req.body;
-  if (!['libre','occupé','hors_ligne'].includes(statut)) return res.status(400).json({ error: 'Statut invalide' });
+  const { lat, lng } = req.body;
+  if (!lat||!lng) return res.status(400).json({ error: 'Position requise' });
   const id = req.user.id;
-  if (statut==='hors_ligne' && await hasCourseActive(id)) return res.status(409).json({ error: 'Terminez la course en cours d\'abord' });
-  if (!drivers[id]) drivers[id] = { lat: null, lng: null, socketId: null };
-  drivers[id].statut = statut;
+  // Si le chauffeur n'est pas en mémoire (après redémarrage), on le réintègre comme libre
+  if (!drivers[id]) drivers[id] = { statut: 'libre', socketId: null };
+  drivers[id].lat = lat;
+  drivers[id].lng = lng;
+  // Si le statut n'est pas défini, mettre libre par défaut
+  if (!drivers[id].statut || drivers[id].statut === 'hors_ligne') {
+    drivers[id].statut = 'libre';
+  }
   io.emit('drivers_updated', await getDriversList());
-  res.json({ ok: true, statut });
+  res.json({ ok: true });
 });
+
 
 app.get('/api/chauffeurs', authMiddleware, async (req, res) => {
   const { lat, lng } = req.query;
