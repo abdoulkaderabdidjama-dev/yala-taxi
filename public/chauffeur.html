@@ -490,6 +490,12 @@ function detecterPos() {
     document.getElementById("map-info").textContent = "GPS non disponible";
     return;
   }
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    userLat = pos.coords.latitude;
+    userLng = pos.coords.longitude;
+    if (map) map.setView([userLat, userLng], 15);
+    document.getElementById("map-info").textContent = "📍 Position obtenue";
+  }, function(){}, {enableHighAccuracy:true, timeout:10000, maximumAge:0});
   navigator.geolocation.watchPosition(function(pos) {
     userLat = pos.coords.latitude;
     userLng = pos.coords.longitude;
