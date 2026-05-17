@@ -494,7 +494,7 @@ function detecterPos() {
     document.getElementById("pos-txt").textContent = "Djibouti-Ville (GPS refuse)";
     document.getElementById("map-info").textContent = "⚠️ GPS non disponible";
     userLat = 11.5883; userLng = 43.1456;
-  }, {enableHighAccuracy:true, maximumAge:5000});
+  }, {enableHighAccuracy:true, maximumAge:0, timeout:10000});
 }
 
 function centrerCarte() {
