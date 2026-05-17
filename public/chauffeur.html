@@ -328,10 +328,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 <div class="toast" id="toast"></div>
 
 <script>
-// Service Worker PWA
+// ─── SERVICE WORKER ─────────────────────────────────────
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(function(){});
 }
+
+// ─── WAKE LOCK : empeche le telephone de s'endormir ─────
+var wakeLock = null;
+async function activerWakeLock() {
+  if ("wakeLock" in navigator) {
+    try {
+      wakeLock = await navigator.wakeLock.request("screen");
+      wakeLock.addEventListener("release", function() {
+        setTimeout(activerWakeLock, 2000);
+      });
+    } catch(e) {}
+  }
+}
+document.addEventListener("visibilitychange", function() {
+  if (document.visibilityState === "visible") {
+    activerWakeLock();
+    // Reconnecter le socket si deconnecte
+    if (socket && !socket.connected) {
+      socket.connect();
+    }
+    // Renvoyer la position immediatement
+    if (userLat && userLng && enLigne && token) {
+      fetch(API + "/api/chauffeur/position", {
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer " + token},
+        body: JSON.stringify({lat:userLat, lng:userLng})
+      }).catch(function(){});
+    }
+  }
+});
+activerWakeLock();
 
 var API = "https://yala-taxi.onrender.com";
 var token = localStorage.getItem("yt_token");
@@ -418,13 +449,13 @@ function cacherTous() {
 function allerAccueil() {
   cacherTous();
   document.getElementById("screen-home").classList.add("active");
-  // Mettre le vrai nom dès le chargement de l'accueil
   if (user) {
     document.getElementById("tnom").textContent = user.nom || "—";
     document.getElementById("ma-note").textContent = user.note || "5.0";
   }
   if (!map) { initMap(); detecterPos(); }
   if (!socket) initSocket();
+  activerWakeLock();
 }
 
 function allerHisto() {
@@ -469,17 +500,10 @@ function copierWA() {
 function initMap() {
   if (map) return;
   map = L.map("map", {zoomControl:false, attributionControl:false}).setView([11.5883, 43.1456], 14);
-
-  // Tuiles sombres style moderne
   L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-    maxZoom: 19,
-    subdomains: "abcd"
+    maxZoom: 19, subdomains: "abcd"
   }).addTo(map);
-
-  // Attribution discrète
   L.control.attribution({prefix: false, position:"bottomleft"}).addTo(map);
-
-  // Clic sur carte pour voir l'adresse
   map.on("click", function(e) {
     showToast("📍 " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4));
   });
@@ -496,20 +520,18 @@ function detecterPos() {
     if (map) map.setView([userLat, userLng], 15);
     document.getElementById("map-info").textContent = "📍 Position obtenue";
   }, function(){}, {enableHighAccuracy:true, timeout:10000, maximumAge:0});
+
   navigator.geolocation.watchPosition(function(pos) {
     userLat = pos.coords.latitude;
     userLng = pos.coords.longitude;
     var acc = Math.round(pos.coords.accuracy);
     document.getElementById("map-info").textContent = "📍 Precision " + acc + "m";
-
     if (map) {
       if (!userMarker) {
-        // Marqueur chauffeur avec style personnalise
         var icon = L.divIcon({
           className: "",
           html: "<div style=\"width:40px;height:40px;border-radius:50%;background:#f59e0b;border:3px solid #000;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 0 4px rgba(245,158,11,0.3)\">🚗</div>",
-          iconSize: [40, 40],
-          iconAnchor: [20, 20]
+          iconSize: [40, 40], iconAnchor: [20, 20]
         });
         userMarker = L.marker([userLat, userLng], {icon:icon}).addTo(map);
         userMarker.bindPopup("<b style='color:#f59e0b'>" + (user ? user.nom : "Vous") + "</b><br>Votre position actuelle");
@@ -543,16 +565,30 @@ function centrerCarte() {
 
 // ─── SOCKET ──────────────────────────────────────────────
 function initSocket() {
-  socket = io(API);
+  socket = io(API, {
+    reconnection: true,
+    reconnectionDelay: 2000,
+    reconnectionAttempts: Infinity
+  });
   socket.on("connect", function() {
-    if (user) socket.emit("register", {userId:user.id, role:"chauffeur"});
+    if (user) {
+      socket.emit("register", {userId:user.id, role:"chauffeur"});
+      // Renvoyer la position apres reconnexion
+      if (userLat && userLng && enLigne) {
+        fetch(API + "/api/chauffeur/position", {
+          method:"POST",
+          headers:{"Content-Type":"application/json","Authorization":"Bearer " + token},
+          body: JSON.stringify({lat:userLat, lng:userLng})
+        }).catch(function(){});
+      }
+    }
   });
   socket.on("nouvelle_demande", function(data) {
     clientWA = data.client.whatsapp;
     afficherDemande(data);
     afficherNotif();
   });
-  socket.on("course_annulee", function(data) {
+  socket.on("course_annulée", function(data) {
     if (data.par === "client") {
       courseActiveId = null; clientWA = null;
       document.getElementById("course-active").style.display = "none";
@@ -608,7 +644,6 @@ function afficherDemande(data) {
   if (data.client.lat && userLat) {
     var d = calcDist(userLat, userLng, data.client.lat, data.client.lng);
     dist = d < 1 ? Math.round(d*1000) + "m" : d.toFixed(1) + "km";
-    // Marqueur client sur la carte
     if (map) {
       var clientIcon = L.divIcon({
         className:"",
