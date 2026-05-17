@@ -523,7 +523,7 @@ function detecterPos() {
   }, function(err) {
     userLat = 11.5883; userLng = 43.1456;
     document.getElementById("map-info").textContent = "⚠️ GPS non disponible";
-  }, {enableHighAccuracy:true, maximumAge:5000});
+  }, {enableHighAccuracy:true, maximumAge:0, timeout:10000});
 }
 
 function centrerCarte() {
