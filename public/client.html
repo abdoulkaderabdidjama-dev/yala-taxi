@@ -467,6 +467,13 @@ function detecterPos() {
     userLat = 11.5883; userLng = 43.1456;
     return;
   }
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    userLat = pos.coords.latitude;
+    userLng = pos.coords.longitude;
+    if (map) map.setView([userLat, userLng], 15);
+    document.getElementById("map-info").textContent = "📍 Position obtenue";
+    document.getElementById("pos-txt").textContent = userLat.toFixed(4) + ", " + userLng.toFixed(4);
+  }, function(){}, {enableHighAccuracy:true, timeout:10000, maximumAge:0});
   navigator.geolocation.watchPosition(function(pos) {
     userLat = pos.coords.latitude;
     userLng = pos.coords.longitude;
