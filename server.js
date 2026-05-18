@@ -179,17 +179,14 @@ app.post('/api/course/repondre', authMiddleware, async (req, res) => {
     if (decision==='accepter') {
       course.statut = 'acceptee'; course.acceptedAt = new Date(); await course.save();
       const chauffeurUser = await User.findById(req.user.id);
-      const clientSocket = clients[course.clientId.toString()]?.socketId;
-      // ✅ Notifier le client que le chauffeur a accepte
-      if (clientSocket) io.to(clientSocket).emit('course_acceptee', {
+      io.emit('course_acceptee', {
         courseId: course._id.toString(),
         chauffeur: { nom: chauffeurUser?.nom, whatsapp: chauffeurUser?.whatsapp, plaque: chauffeurUser?.plaque }
       });
     } else {
       course.statut = 'refusee'; await course.save();
       if (drivers[req.user.id]) drivers[req.user.id].statut = 'libre';
-      const clientSocket = clients[course.clientId.toString()]?.socketId;
-      if (clientSocket) io.to(clientSocket).emit('course_refusee', { courseId });
+      io.emit('course_refusee', { courseId: course._id.toString() });
       io.emit('drivers_updated', await getDriversList());
     }
     res.json({ ok: true, statut: course.statut });
@@ -205,21 +202,10 @@ app.post('/api/course/annuler', authMiddleware, async (req, res) => {
       statut: { $in: ['en_attente','acceptee'] }
     });
     if (!course) return res.status(404).json({ error: 'Course introuvable' });
-    if (req.user.role==='client' && course.statut==='acceptee') {
-      const elapsed = (Date.now() - new Date(course.acceptedAt).getTime()) / 60000;
-      if (elapsed > 2) return res.status(409).json({ error: 'Delai annulation depasse (2 min). Contactez le chauffeur sur WhatsApp.' });
-    }
     course.statut = 'annulee'; await course.save();
     const chauffeurId = course.chauffeurId.toString();
     if (drivers[chauffeurId]) drivers[chauffeurId].statut = 'libre';
-    // ✅ Notifier les deux parties
-    if (req.user.role==='client') {
-      const s = drivers[chauffeurId]?.socketId;
-      if (s) io.to(s).emit('course_annulee', { courseId, par: 'client' });
-    } else {
-      const s = clients[course.clientId.toString()]?.socketId;
-      if (s) io.to(s).emit('course_annulee', { courseId, par: 'chauffeur' });
-    }
+    io.emit('course_annulee', { courseId: course._id.toString(), par: req.user.role });
     io.emit('drivers_updated', await getDriversList());
     res.json({ ok: true });
   } catch(err) { res.status(500).json({ error: 'Erreur serveur' }); }
@@ -234,8 +220,7 @@ app.post('/api/course/terminer', authMiddleware, async (req, res) => {
     course.statut = 'terminee'; course.finishedAt = new Date(); await course.save();
     const chauffeurId = req.user.id;
     if (drivers[chauffeurId]) drivers[chauffeurId].statut = 'libre';
-    const s = clients[course.clientId.toString()]?.socketId;
-    if (s) io.to(s).emit('course_terminee', { courseId });
+    io.emit('course_terminee', { courseId: course._id.toString() });
     io.emit('drivers_updated', await getDriversList());
     res.json({ ok: true });
   } catch(err) { res.status(500).json({ error: 'Erreur serveur' }); }
@@ -277,6 +262,10 @@ io.on('connection', (socket) => {
       io.emit('drivers_updated', await getDriversList());
     } else if (role==='client' && clients[userId]) {
       clients[userId].lat = lat; clients[userId].lng = lng;
+      const clientsPositions = Object.entries(clients)
+        .filter(([,c]) => c.lat && c.lng)
+        .map(([id, c]) => ({ id, lat: c.lat, lng: c.lng }));
+      io.emit('clients_updated', clientsPositions);
     }
   });
 
@@ -290,7 +279,10 @@ io.on('connection', (socket) => {
       }
     }
     for (const [id, c] of Object.entries(clients)) {
-      if (c.socketId===socket.id) { c.socketId = null; break; }
+      if (c.socketId===socket.id) {
+        c.socketId = null;
+        break;
+      }
     }
   });
 });
