@@ -573,7 +573,6 @@ function initSocket() {
   socket.on("connect", function() {
     if (user) {
       socket.emit("register", {userId:user.id, role:"chauffeur"});
-      // Renvoyer la position apres reconnexion
       if (userLat && userLng && enLigne) {
         fetch(API + "/api/chauffeur/position", {
           method:"POST",
@@ -583,6 +582,22 @@ function initSocket() {
       }
     }
   });
+  socket.on("nouvelle_demande", function(data) {
+    clientWA = data.client.whatsapp;
+    afficherDemande(data);
+    afficherNotif();
+  });
+  // ✅ Sans accents
+  socket.on("course_annulee", function(data) {
+    if (data.par === "client") {
+      courseActiveId = null; clientWA = null;
+      document.getElementById("course-active").style.display = "none";
+      afficherDemandes("vide");
+      showToast("⚠️ Le client a annule la course");
+      changerStatut("libre");
+    }
+  });
+}
   socket.on("nouvelle_demande", function(data) {
     clientWA = data.client.whatsapp;
     afficherDemande(data);
