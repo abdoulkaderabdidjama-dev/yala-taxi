@@ -502,38 +502,47 @@ function centrerCarte() {
 }
 
 function initSocket() {
-  socket = io(API);
+  socket = io(API, {
+    reconnection: true,
+    reconnectionDelay: 2000,
+    reconnectionAttempts: Infinity
+  });
   socket.on("connect", function() {
     if (user) socket.emit("register", {userId:user.id, role:"client"});
   });
   socket.on("drivers_updated", function(drivers) {
     majMarqueurs(drivers);
   });
-  // ✅ CORRIGE : accents alignes avec le serveur
-  socket.on("course_acceptée", function(data) {
+  // ✅ Sans accents — confirmation acceptation
+  socket.on("course_acceptee", function(data) {
     courseActive = data.courseId;
     chauffeurWA = data.chauffeur.whatsapp;
-    document.getElementById("chauff-nom").textContent = data.chauffeur.nom + " — " + (data.chauffeur.plaque || "");
-    document.getElementById("course-info").textContent = "Chauffeur en route vers vous !";
+    document.getElementById("chauff-nom").textContent = "🚗 " + data.chauffeur.nom + " — " + (data.chauffeur.plaque || "");
+    document.getElementById("course-info").textContent = "✅ Chauffeur en route vers vous !";
     document.getElementById("course-ban").style.display = "flex";
     document.getElementById("btn-search").disabled = true;
     nbCourses++;
-    showToast("✅ Le chauffeur a accepte votre course !");
+    showToast("✅ " + data.chauffeur.nom + " a accepte votre course ! Il est en route.");
   });
-  socket.on("course_refusée", function() {
+  // ✅ Sans accents — refus
+  socket.on("course_refusee", function() {
     courseActive = null;
+    document.getElementById("course-ban").style.display = "none";
     document.getElementById("btn-search").disabled = false;
-    showToast("Le chauffeur a refuse. Essayez un autre.");
+    showToast("❌ Le chauffeur a refuse. Choisissez un autre taxi.");
+    rechercherTaxis();
   });
-  socket.on("course_annulée", function() {
+  // ✅ Sans accents — annulation
+  socket.on("course_annulee", function(data) {
     courseActive = null;
     chauffeurWA = null;
     document.getElementById("course-ban").style.display = "none";
     document.getElementById("btn-search").disabled = false;
-    showToast("Course annulee par le chauffeur");
+    showToast("⚠️ Course annulee par le chauffeur. Cherchez un autre taxi.");
     rechercherTaxis();
   });
-  socket.on("course_terminée", function() {
+  // ✅ Sans accents — terminee
+  socket.on("course_terminee", function() {
     courseActive = null;
     chauffeurWA = null;
     document.getElementById("course-ban").style.display = "none";
