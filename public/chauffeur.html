@@ -120,7 +120,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 </head>
 <body>
 
-<!-- ECRAN AUTH -->
 <div class="screen active" id="screen-auth">
   <div class="logo">🚗</div>
   <div class="titre">YalaTaxi</div>
@@ -153,7 +152,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   </div>
 </div>
 
-<!-- ECRAN ACCUEIL -->
 <div class="screen" id="screen-home">
   <div class="topbar">
     <div>
@@ -207,7 +205,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   </div>
 </div>
 
-<!-- ECRAN HISTORIQUE -->
 <div class="screen" id="screen-histo">
   <div class="htop">
     <button class="hbk" onclick="allerAccueil()">←</button>
@@ -222,7 +219,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   </div>
 </div>
 
-<!-- ECRAN AVIS -->
 <div class="screen" id="screen-avis">
   <div class="htop">
     <button class="hbk" onclick="allerAccueil()">←</button>
@@ -239,7 +235,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   </div>
 </div>
 
-<!-- ECRAN PROFIL -->
 <div class="screen" id="screen-profil">
   <div class="htop">
     <button class="hbk" onclick="allerAccueil()">←</button>
@@ -279,7 +274,6 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(function(){});
 }
 
-// ─── WAKE LOCK ───────────────────────────────────────────
 var wakeLock = null;
 async function activerWakeLock() {
   if ("wakeLock" in navigator) {
@@ -461,7 +455,6 @@ function centrerCarte() {
   else showToast("Position non disponible");
 }
 
-// ─── AFFICHER CLIENTS SUR CARTE ──────────────────────────
 function afficherClientsCarteChauffeur(clientsList) {
   if (!map) return;
   for (var id in clientMarkers) {
@@ -486,7 +479,6 @@ function afficherClientsCarteChauffeur(clientsList) {
   }
 }
 
-// ─── SOCKET ──────────────────────────────────────────────
 function initSocket() {
   socket = io(API, {reconnection:true, reconnectionDelay:2000, reconnectionAttempts:Infinity});
 
@@ -505,28 +497,26 @@ function initSocket() {
     afficherNotif();
   });
 
-  // ✅ Client annule la course — chauffeur est notifie
   socket.on("course_annulee", function(data) {
-    if (data.par === "client") {
-      courseActiveId = null; clientWA = null;
-      document.getElementById("course-active").style.display = "none";
-      afficherDemandes("vide");
-      showToast("⚠️ Le client a annule la course ! Vous etes de nouveau disponible.");
-      changerStatut("libre");
-      enLigne = true;
-      document.getElementById("tog-btn").className = "tog-sw ton";
-      document.getElementById("tog-lbl").textContent = "🟢 Disponible";
-      document.getElementById("tog-sub").textContent = "Les clients peuvent vous voir";
-    }
+    if (!courseActiveId) return;
+    if (data && data.courseId !== courseActiveId) return;
+    if (data && data.par === "chauffeur") return;
+    courseActiveId = null; clientWA = null;
+    document.getElementById("course-active").style.display = "none";
+    afficherDemandes("vide");
+    showToast("⚠️ Le client a annule la course ! Vous etes de nouveau disponible.");
+    changerStatut("libre");
+    enLigne = true;
+    document.getElementById("tog-btn").className = "tog-sw ton";
+    document.getElementById("tog-lbl").textContent = "🟢 Disponible";
+    document.getElementById("tog-sub").textContent = "Les clients peuvent vous voir";
   });
 
-  // ✅ Clients visibles sur la carte
   socket.on("clients_updated", function(clientsList) {
     afficherClientsCarteChauffeur(clientsList);
   });
 }
 
-// ─── STATUT ──────────────────────────────────────────────
 async function toggleStatut() {
   if (courseActiveId) { showToast("Terminez la course en cours d'abord"); return; }
   enLigne = !enLigne;
@@ -591,21 +581,33 @@ async function repondre(courseId, decision, clientNom) {
   } catch(e) { showToast("Erreur de connexion"); }
 }
 
-// ✅ Chauffeur peut annuler la course
 async function annulerCourseChauf() {
   if (!courseActiveId) return;
   if (!confirm("Annuler la course en cours ?")) return;
+  var savedId = courseActiveId;
+  courseActiveId = null; clientWA = null;
+  document.getElementById("course-active").style.display = "none";
+  afficherDemandes("vide");
+  enLigne = true;
+  document.getElementById("tog-btn").className = "tog-sw ton";
+  document.getElementById("tog-lbl").textContent = "🟢 Disponible";
+  document.getElementById("tog-sub").textContent = "Les clients peuvent vous voir";
   try {
-    var r = await fetch(API+"/api/course/annuler",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({courseId:courseActiveId})});
+    var r = await fetch(API+"/api/course/annuler",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({courseId:savedId})});
     var d = await r.json();
-    if (!r.ok) { showToast(d.error); return; }
-    courseActiveId = null; clientWA = null;
-    document.getElementById("course-active").style.display = "none";
-    afficherDemandes("vide");
-    enLigne = true;
-    await changerStatut("libre");
+    if (!r.ok) {
+      courseActiveId = savedId;
+      document.getElementById("course-active").style.display = "block";
+      showToast(d.error || "Erreur");
+      return;
+    }
     showToast("Course annulee. Vous etes de nouveau disponible.");
-  } catch(e) { showToast("Erreur"); }
+    await changerStatut("libre");
+  } catch(e) {
+    courseActiveId = savedId;
+    document.getElementById("course-active").style.display = "block";
+    showToast("Erreur");
+  }
 }
 
 async function terminerCourse() {
